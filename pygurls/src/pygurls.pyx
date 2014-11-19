@@ -42,7 +42,7 @@ from within Python.
 @author: Pedro Santana (psantana@mit.edu).
 """ 
 
-#cdef extern from "Rectangle.h" namespace "gurls":
+#cdef extern from "pygurls_wrapper.h" namespace "gurls":
 #    cdef cppclass Rectangle:
 #        Rectangle(int, int, int, int) except +
 #        int x0, y0, x1, y1
