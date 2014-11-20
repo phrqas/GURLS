@@ -43,6 +43,8 @@ using namespace gurls;
 PyGURLSWrapper::PyGURLSWrapper()
 {
     this->seq = NULL;
+    this->processes = NULL;    
+    this->opt = NULL;    
 }
 
 void PyGURLSWrapper::load_train_data(char* xtr_file, char* ytr_file)
@@ -57,11 +59,11 @@ void PyGURLSWrapper::load_test_data(char* xte_file, char* yte_file)
     this->yte.readCSV(yte_file);
 }
 
-void PyGURLSWrapper::set_task_sequence(char* seq_str){
+void PyGURLSWrapper::set_task_sequence(char* seq_str)
+{
     char *token;
-    if (this->seq != NULL)    
-        delete this->seq;
-    
+
+    this->clear_task_sequence();    
     this->seq = new OptTaskSequence();
         
     token = strtok (seq_str,"\n");
@@ -72,14 +74,94 @@ void PyGURLSWrapper::set_task_sequence(char* seq_str){
     }
 }
 
-void PyGURLSWrapper::train(char* job_id)
+void PyGURLSWrapper::clear_task_sequence()
 {
-    this->G.run(this->Xtr,this->ytr, *(this->opt), job_id);
+     if (this->seq != NULL)
+    {
+        delete this->seq;
+        this->seq = NULL;
+    }
+} 
+
+void PyGURLSWrapper::add_process(char* p_name, char* opt_str)
+{
+    char *token; //Tokens from the option string
+    
+    if (this->processes == NULL)
+        throw std::runtime_error("Initialize before adding processes.");
+
+    OptProcess* opt_process = new OptProcess(); //new optimization process
+
+    token = strtok (opt_str,"\n");
+    while (token != NULL)
+    {   
+        if (strcmp(token,"computeNsave") == 0)
+            *opt_process << GURLS::computeNsave;
+        else if (strcmp(token,"ignore") == 0)
+            *opt_process << GURLS::ignore;
+        else if (strcmp(token,"load") == 0)
+            *opt_process << GURLS::load;           
+            
+        token = strtok (NULL,"\n"); //Next token
+    }        
+    this->processes->addOpt(p_name,opt_process);//Adds to current process list
 }
 
-void PyGURLSWrapper::test(char* job_id)
+void PyGURLSWrapper::clear_processes()
 {
-    this->G.run(this->Xte,this->yte, *(this->opt), job_id);
+    if (this->processes != NULL)
+    {
+        delete this->processes;
+        this->processes = NULL;
+    }
+}
+
+void PyGURLSWrapper::init_processes(char* p_name, bool use_default)
+{
+    this->clear_processes();   
+    this->processes = new GurlsOptionsList(p_name, use_default);
+}
+
+void PyGURLSWrapper::build_pipeline(char* p_name, bool use_default)
+{
+    if (this->seq == NULL)
+        throw std::runtime_error("Empty task sequence!");
+
+    if (this->processes == NULL)
+        throw std::runtime_error("Empty list of processes!");
+
+    // builds the GURLS++ pipeline
+    this->opt = new GurlsOptionsList(p_name, use_default);
+    this->opt->addOpt("seq", this->seq);
+    this->opt->addOpt("processes", this->processes);
+}
+
+int PyGURLSWrapper::train(char* job_id)
+{
+    try
+    {
+        this->G.run(this->Xtr,this->ytr, *(this->opt), job_id);
+        return EXIT_SUCCESS;
+    }
+    catch(gException& e)
+    {
+        cout << e.getMessage() << endl;
+        return EXIT_FAILURE;
+    }
+}
+
+int PyGURLSWrapper::test(char* job_id)
+{
+    try
+    {
+        this->G.run(this->Xte,this->yte, *(this->opt), job_id);
+        return EXIT_SUCCESS;
+    }
+    catch(gException& e)
+    {
+        cout << e.getMessage() << endl;
+        return EXIT_FAILURE;
+    }
 }
 
 int PyGURLSWrapper::helloWorld()

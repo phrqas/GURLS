@@ -35,6 +35,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 #include <iostream> 
+#include <stdexcept>
 #include <string>
 #include <string.h>
 
@@ -54,15 +55,23 @@ namespace gurls {
     private:
         GURLS G;
         gMat2D<double> Xtr, Xte, ytr, yte;
-        OptTaskSequence *seq; // task sequence
+        OptTaskSequence *seq; // task sequence        
+        GurlsOptionsList *processes; //GURLS processes
         GurlsOptionsList *opt; // options structure
     public:
         PyGURLSWrapper();
         void load_train_data(char* xtr_file, char* ytr_file);
         void load_test_data(char* xte_file, char* yte_file);
         void set_task_sequence(char* seq_str);
-        void train(char* job_id);
-        void test(char* job_id);
+        void clear_task_sequence();
+        void add_process(char* p_name, char* opt_str);        
+        void init_processes(char* p_name, bool use_default);
+        void clear_processes();
+        void build_pipeline(char* p_name, bool use_default);
+        int train(char* job_id);
+        int test(char* job_id);
         int helloWorld();
     };
 }
+
+

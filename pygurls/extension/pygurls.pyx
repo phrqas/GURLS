@@ -46,12 +46,18 @@ natively from within Python.
 cdef extern from "pygurls_wrapper.h" namespace "gurls":
     cdef cppclass PyGURLSWrapper:
         PyGURLSWrapper() except +
-        void load_train_data(char*,char*)
-        void load_test_data(char*,char*)
-        void set_task_sequence(char*)
-        void train(char*)
-        void test(char*)
-        int helloWorld() 
+        void load_train_data(char*,char*) except +
+        void load_test_data(char*,char*) except +
+        void set_task_sequence(char*) except +
+        void clear_task_sequence() except +
+        void add_process(char*, char*) except +
+        void init_processes(char*, bool) except +
+        void clear_processes() except +
+        void build_pipeline(char*, bool) except +
+        int train(char*) except +
+        int test(char*) except +
+        int helloWorld() except +
+        
         
 cdef class PyGURLS:
     """Class that provides an Python interface to the functions in the C++
@@ -72,15 +78,30 @@ cdef class PyGURLS:
     def load_test_data(self,xte_file,yte_file):
         self.thisptr.load_test_data(xte_file,yte_file)
     
-    def set_task_sequence(self,seq_dic):
-        str_list = [k+":"+v for k,v in seq_dic.iteritems()]    
+    def set_task_sequence(self,task_list):
+        str_list = [p[0]+":"+p[1] for p in task_list]    
         self.thisptr.set_task_sequence("\n".join(str_list))
     
+    def clear_task_sequence(self):
+        self.thisptr.clear_task_sequence()
+    
+    def add_process(self,p_name,opt_str_list):
+        self.thisptr.add_process(p_name,"\n".join(opt_str_list))
+    
+    def init_processes(self,p_name,use_default):        
+        self.thisptr.init_processes(p_name,use_default)   
+    
+    def clear_processes(self):        
+        self.thisptr.clear_processes()
+    
+    def build_pipeline(self,p_name,use_default):
+        self.thisptr.build_pipeline(p_name,use_default)
+    
     def train(self,job_id):
-        self.thisptr.train(job_id)    
+        return self.thisptr.train(job_id)    
         
     def test(self,job_id):
-        self.thisptr.test(job_id)
+        return self.thisptr.test(job_id)
     
     def helloWorld(self):
         self.thisptr.helloWorld()
