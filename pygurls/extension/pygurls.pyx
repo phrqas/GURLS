@@ -1,4 +1,4 @@
-#  A Python wrapper for GURLS++
+#  A Python wrapper for GURLS++.
 #
 #  Copyright (c) 2015 Pedro Santana. All rights reserved.
 #
@@ -34,32 +34,35 @@
 #  POSSIBILITY OF SUCH DAMAGE.
 #
 """
-A Python wrapper for GURLS++/bGURLS++
+A Python wrapper for GURLS++
 
-This is a Cython wrapper for allowing GURLS++/bGURLS++ functions to be called
-from within Python.
+This is a Cython wrapper that allows GURLS++ functions to be called from 
+natively from within Python.
 
 @author: Pedro Santana (psantana@mit.edu).
 """ 
 
+#Declares the C++ wrapper class
 cdef extern from "pygurls_wrapper.h" namespace "gurls":
     cdef cppclass PyGURLSWrapper:
         PyGURLSWrapper() except +
+        void helloWorld()
         
 cdef class PyGURLS:
+    """Class that provides an Python interface to the functions in the C++
+    wrapper class."""
     cdef PyGURLSWrapper *thisptr # hold a C++ instance which we're wrapping
-    def __cinit__(self):
-        self.thisptr = new PyGURLSWrapper()
+    
+    def __cinit__(self,*args,**kwargs):
+        """Constructor for extension type."""
+        self.thisptr = new PyGURLSWrapper() #Just declares a pointer
     def __dealloc__(self):
+        """Destructor for extension type."""
         del self.thisptr
     
-
-
-#class PyGURLS(object):
-#    """Wrapper class that encapsulates the funcionalities of GURLS into Python."""
-#    def __init__(self):
-#        #cdef PyGURLSWrapper *w = new PyGURLSWrapper(1)
-#        print "You've created a pyGURLS wrapper object!"
+    def helloWorld(self):
+        self.thisptr.helloWorld()
+    
         
         
         

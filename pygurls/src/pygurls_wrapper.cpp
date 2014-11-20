@@ -5,6 +5,11 @@ using namespace gurls;
 
 PyGURLSWrapper::PyGURLSWrapper()
 {
+    std::cout << "\tPyGURLSWrapper instance created\n";
+}
+
+void PyGURLSWrapper::helloWorld()
+{
     typedef double T;
     
     gMat2D<T> Xtr, Xte, ytr, yte;

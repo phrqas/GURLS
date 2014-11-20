@@ -10,5 +10,6 @@ namespace gurls {
     class PyGURLSWrapper {
     public:
         PyGURLSWrapper();
+        void helloWorld();
     };
 }
