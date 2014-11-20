@@ -42,10 +42,47 @@ using namespace gurls;
 
 PyGURLSWrapper::PyGURLSWrapper()
 {
-    std::cout << "\tPyGURLSWrapper instance created\n";
+    this->seq = NULL;
 }
 
-void PyGURLSWrapper::helloWorld()
+void PyGURLSWrapper::load_train_data(char* xtr_file, char* ytr_file)
+{    
+    this->Xtr.readCSV(xtr_file);
+    this->ytr.readCSV(ytr_file);
+}
+
+void PyGURLSWrapper::load_test_data(char* xte_file, char* yte_file)
+{
+    this->Xte.readCSV(xte_file);
+    this->yte.readCSV(yte_file);
+}
+
+void PyGURLSWrapper::set_task_sequence(char* seq_str){
+    char *token;
+    if (this->seq != NULL)    
+        delete this->seq;
+    
+    this->seq = new OptTaskSequence();
+        
+    token = strtok (seq_str,"\n");
+    while (token != NULL)
+    {   
+        *(this->seq) << string(token);
+        token = strtok (NULL,"\n");
+    }
+}
+
+void PyGURLSWrapper::train(char* job_id)
+{
+    this->G.run(this->Xtr,this->ytr, *(this->opt), job_id);
+}
+
+void PyGURLSWrapper::test(char* job_id)
+{
+    this->G.run(this->Xte,this->yte, *(this->opt), job_id);
+}
+
+int PyGURLSWrapper::helloWorld()
 {
     typedef double T;
     
@@ -95,5 +132,8 @@ void PyGURLSWrapper::helloWorld()
     catch (gException& e)
     {
         std::cout << e.getMessage() << std::endl;        
+        return EXIT_FAILURE;
     }
+    
+    return EXIT_SUCCESS;
 }

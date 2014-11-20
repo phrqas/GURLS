@@ -36,6 +36,7 @@
  */
 #include <iostream> 
 #include <string>
+#include <string.h>
 
 #include "gurls++/gurls.h"
 #include "gurls++/exceptions.h"
@@ -48,14 +49,20 @@
 #include "gurls++/quickanddirty.h" //This should be removed at some point
 
 namespace gurls {
-    
-    typedef double T; ///< Data type of the matrices elements
-    
+       
     class PyGURLSWrapper {
+    private:
+        GURLS G;
+        gMat2D<double> Xtr, Xte, ytr, yte;
+        OptTaskSequence *seq; // task sequence
+        GurlsOptionsList *opt; // options structure
     public:
-        gMat2D<T> Xtr, Xte, ytr, yte;
         PyGURLSWrapper();
-        void helloWorld();
-        //readCSV();
+        void load_train_data(char* xtr_file, char* ytr_file);
+        void load_test_data(char* xte_file, char* yte_file);
+        void set_task_sequence(char* seq_str);
+        void train(char* job_id);
+        void test(char* job_id);
+        int helloWorld();
     };
 }
