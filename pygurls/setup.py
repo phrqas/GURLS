@@ -18,7 +18,7 @@ def read(fname):
 #                        libraries=["libgurls++"])]
 
 ext_modules = [Extension("pygurls", 
-                         ["src/pygurls.pyx","src/pygurls_wrapper.cpp"],                        
+                         ["extension/pygurls.pyx","src/pygurls_wrapper.cpp"],                        
                         include_dirs = [SRC_DIR,INCLUDE_DIR],                       
                         library_dirs = [LIB_DIR],
                         libraries=["gurls++"],
