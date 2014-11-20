@@ -42,21 +42,24 @@ from within Python.
 @author: Pedro Santana (psantana@mit.edu).
 """ 
 
-#cdef extern from "pygurls_wrapper.h" namespace "gurls":
-#    cdef cppclass Rectangle:
-#        Rectangle(int, int, int, int) except +
-#        int x0, y0, x1, y1
-#        int getLength()
-#        int getHeight()
-#        int getArea()
-#        void move(int, int)
+cdef extern from "pygurls_wrapper.h" namespace "gurls":
+    cdef cppclass PyGURLSWrapper:
+        PyGURLSWrapper() except +
+        
+cdef class PyGURLS:
+    cdef PyGURLSWrapper *thisptr # hold a C++ instance which we're wrapping
+    def __cinit__(self):
+        self.thisptr = new PyGURLSWrapper()
+    def __dealloc__(self):
+        del self.thisptr
+    
 
-#GurlsOption
 
-class PyGURLS(object):
-    """Wrapper class that encapsulates the funcionalities of GURLS into Python."""
-    def __init__(self):
-        print "You've created a pyGURLS wrapper object!"
+#class PyGURLS(object):
+#    """Wrapper class that encapsulates the funcionalities of GURLS into Python."""
+#    def __init__(self):
+#        #cdef PyGURLSWrapper *w = new PyGURLSWrapper(1)
+#        print "You've created a pyGURLS wrapper object!"
         
         
         
