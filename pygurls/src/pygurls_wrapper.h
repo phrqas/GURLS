@@ -65,8 +65,8 @@ namespace gurls {
         void clear_data();
         void set_task_sequence(char* seq_str);
         void clear_task_sequence();
-        void add_process(char* p_name, char* opt_str);        
         void init_processes(char* p_name, bool use_default);
+        void add_process(char* p_name, char* opt_str);                
         void clear_processes();
         void build_pipeline(char* p_name, bool use_default);
         void clear_pipeline();
