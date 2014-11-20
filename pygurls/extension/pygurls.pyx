@@ -51,7 +51,7 @@ cdef extern from "pygurls_wrapper.h" namespace "gurls":
         void set_task_sequence(char*)
         void train(char*)
         void test(char*)
-        int helloWorld()
+        int helloWorld() 
         
 cdef class PyGURLS:
     """Class that provides an Python interface to the functions in the C++
