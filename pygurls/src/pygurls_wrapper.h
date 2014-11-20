@@ -40,6 +40,7 @@
 #include <string.h>
 
 #include "gurls++/gurls.h"
+#include "gurls++/traintest.h"
 #include "gurls++/exceptions.h"
 #include "gurls++/gvec.h"
 #include "gurls++/gmat2d.h"
@@ -47,30 +48,29 @@
 #include "gurls++/optlist.h"
 #include "gurls++/gmath.h"
 
-#include "gurls++/quickanddirty.h" //This should be removed at some point
-
 namespace gurls {
        
     class PyGURLSWrapper {
     private:
         GURLS G;
-        gMat2D<double> Xtr, Xte, ytr, yte;
+        std::map< char*, gMat2D<double>* > data_map;        
         OptTaskSequence *seq; // task sequence        
         GurlsOptionsList *processes; //GURLS processes
         GurlsOptionsList *opt; // options structure
     public:
         PyGURLSWrapper();
-        void load_train_data(char* xtr_file, char* ytr_file);
-        void load_test_data(char* xte_file, char* yte_file);
+        ~PyGURLSWrapper();
+        void add_data(char* data_file, char* data_id);     
+        void erase_data(char* data_id);
+        void clear_data();
         void set_task_sequence(char* seq_str);
         void clear_task_sequence();
         void add_process(char* p_name, char* opt_str);        
         void init_processes(char* p_name, bool use_default);
         void clear_processes();
         void build_pipeline(char* p_name, bool use_default);
-        int train(char* job_id);
-        int test(char* job_id);
-        int helloWorld();
+        void clear_pipeline();
+        int  run(char* in_data, char* out_data, char* job_id);      
     };
 }
 

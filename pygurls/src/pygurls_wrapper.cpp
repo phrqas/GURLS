@@ -47,17 +47,36 @@ PyGURLSWrapper::PyGURLSWrapper()
     this->opt = NULL;    
 }
 
-void PyGURLSWrapper::load_train_data(char* xtr_file, char* ytr_file)
-{    
-    this->Xtr.readCSV(xtr_file);
-    this->ytr.readCSV(ytr_file);
+PyGURLSWrapper::~PyGURLSWrapper()
+{
+    //this->clear_pipeline();
+    //this->clear_data();
 }
 
-void PyGURLSWrapper::load_test_data(char* xte_file, char* yte_file)
+void PyGURLSWrapper::add_data(char* data_file, char* data_id)
 {
-    this->Xte.readCSV(xte_file);
-    this->yte.readCSV(yte_file);
+    gMat2D<double> *pdata = new gMat2D<double>(); //new container
+    pdata->readCSV(data_file); //loads data from file    
+    this->data_map[data_id] = pdata; //stores the reference
 }
+
+void PyGURLSWrapper::erase_data(char* data_id)
+{
+    delete this->data_map[data_id]; // deallocates the data
+    this->data_map.erase(data_id); // removes the reference
+}
+
+void PyGURLSWrapper::clear_data()
+{    
+    // deallocates all data
+    std::map< char*, gMat2D<double>* >::iterator it;
+    for(it = this->data_map.begin(); it != this->data_map.end(); ++it)
+        delete this->data_map[it->first];
+    
+    // clears map
+    this->data_map.clear();
+}
+
 
 void PyGURLSWrapper::set_task_sequence(char* seq_str)
 {
@@ -100,8 +119,14 @@ void PyGURLSWrapper::add_process(char* p_name, char* opt_str)
         else if (strcmp(token,"ignore") == 0)
             *opt_process << GURLS::ignore;
         else if (strcmp(token,"load") == 0)
-            *opt_process << GURLS::load;           
-            
+            *opt_process << GURLS::load;   
+        else if (strcmp(token,"compute") == 0)
+            *opt_process << GURLS::compute;
+        else if (strcmp(token,"remove") == 0)
+            *opt_process << GURLS::remove;         
+        else
+            throw std::runtime_error(std::string(token)+": unsupported action.");
+
         token = strtok (NULL,"\n"); //Next token
     }        
     this->processes->addOpt(p_name,opt_process);//Adds to current process list
@@ -136,11 +161,23 @@ void PyGURLSWrapper::build_pipeline(char* p_name, bool use_default)
     this->opt->addOpt("processes", this->processes);
 }
 
-int PyGURLSWrapper::train(char* job_id)
+void PyGURLSWrapper::clear_pipeline()
+{
+    this->clear_task_sequence();
+    this->clear_processes();
+    
+    if (this->opt != NULL)
+    {
+        delete this->opt;
+        this->opt = NULL;
+    }
+}
+
+int PyGURLSWrapper::run(char* in_data, char* out_data, char* job_id)
 {
     try
-    {
-        this->G.run(this->Xtr,this->ytr, *(this->opt), job_id);
+    {        
+        this->G.run(*(this->data_map[in_data]),*(this->data_map[out_data]),*(this->opt), job_id);
         return EXIT_SUCCESS;
     }
     catch(gException& e)
@@ -150,72 +187,58 @@ int PyGURLSWrapper::train(char* job_id)
     }
 }
 
-int PyGURLSWrapper::test(char* job_id)
-{
-    try
-    {
-        this->G.run(this->Xte,this->yte, *(this->opt), job_id);
-        return EXIT_SUCCESS;
-    }
-    catch(gException& e)
-    {
-        cout << e.getMessage() << endl;
-        return EXIT_FAILURE;
-    }
-}
-
-int PyGURLSWrapper::helloWorld()
-{
-    typedef double T;
-    
-    gMat2D<T> Xtr, Xte, ytr, yte;
-
-    std::string XtrFileName = "Xtr.txt";
-    std::string ytrFileName = "ytr_onecolumn.txt";
-    std::string XteFileName = "Xte.txt";
-    std::string yteFileName = "yte_onecolumn.txt";
-
-    try
-    {
-        //load the training data
-        Xtr.readCSV(XtrFileName);
-        ytr.readCSV(ytrFileName);
-
-        //load the test data
-        Xte.readCSV(XteFileName);
-        yte.readCSV(yteFileName);
-
-
-        //train the classifer
-        GurlsOptionsList* opt = gurls_train(Xtr, ytr);
-
-        //predict the labels for the test set and asses prediction accuracy
-        gurls_test(Xte, yte, *opt);
-
-
-        const gMat2D<T>& acc = opt->getOptValue<OptMatrix<gMat2D<T> > >("acc");
-        const int max = static_cast<int>(*std::max_element(ytr.getData(), ytr.getData()+ytr.getSize()));
-        const int accs = acc.getSize();
-
-        std::cout.precision(4);
-
-        std::cout << std::endl << "Prediction accurcay is:" << std::endl;
-
-        for(int i=1; i<= max; ++i)
-            std::cout << "\tClass " << i << "\t";
-
-        std::cout << std::endl;
-
-        for(int i=0; i< accs; ++i)
-            std::cout << "\t" << acc.getData()[i]*100.0 << "%\t";
-
-        std::cout << std::endl;       
-    }
-    catch (gException& e)
-    {
-        std::cout << e.getMessage() << std::endl;        
-        return EXIT_FAILURE;
-    }
-    
-    return EXIT_SUCCESS;
-}
+//int PyGURLSWrapper::helloWorld()
+//{
+//    typedef double T;
+//    
+//    gMat2D<T> Xtr, Xte, ytr, yte;
+//
+//    std::string XtrFileName = "Xtr.txt";
+//    std::string ytrFileName = "ytr_onecolumn.txt";
+//    std::string XteFileName = "Xte.txt";
+//    std::string yteFileName = "yte_onecolumn.txt";
+//
+//    try
+//    {
+//        //load the training data
+//        Xtr.readCSV(XtrFileName);
+//        ytr.readCSV(ytrFileName);
+//
+//        //load the test data
+//        Xte.readCSV(XteFileName);
+//        yte.readCSV(yteFileName);
+//
+//
+//        //train the classifer
+//        GurlsOptionsList* opt = gurls_train(Xtr, ytr);
+//
+//        //predict the labels for the test set and asses prediction accuracy
+//        gurls_test(Xte, yte, *opt);
+//
+//
+//        const gMat2D<T>& acc = opt->getOptValue<OptMatrix<gMat2D<T> > >("acc");
+//        const int max = static_cast<int>(*std::max_element(ytr.getData(), ytr.getData()+ytr.getSize()));
+//        const int accs = acc.getSize();
+//
+//        std::cout.precision(4);
+//
+//        std::cout << std::endl << "Prediction accurcay is:" << std::endl;
+//
+//        for(int i=1; i<= max; ++i)
+//            std::cout << "\tClass " << i << "\t";
+//
+//        std::cout << std::endl;
+//
+//        for(int i=0; i< accs; ++i)
+//            std::cout << "\t" << acc.getData()[i]*100.0 << "%\t";
+//
+//        std::cout << std::endl;       
+//    }
+//    catch (gException& e)
+//    {
+//        std::cout << e.getMessage() << std::endl;        
+//        return EXIT_FAILURE;
+//    }
+//    
+//    return EXIT_SUCCESS;
+//}

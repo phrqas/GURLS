@@ -56,10 +56,13 @@ if len(sys.argv) != 5:
 
 # python object that handles the interface with GURLS++
 pg = pygurls.PyGURLS()
+#pg.clear_pipeline() 
 
 # load data from files specified as command-line arguments
-pg.load_train_data(sys.argv[1],sys.argv[3])
-pg.load_test_data(sys.argv[2],sys.argv[4])
+pg.add_data(sys.argv[1],'xtr')
+pg.add_data(sys.argv[2],'xte')
+pg.add_data(sys.argv[3],'ytr')
+pg.add_data(sys.argv[4],'yte')
 
 # specify the task sequence
 task_list = [['paramsel','loocvprimal'],
@@ -85,10 +88,10 @@ pg.add_process('test_process',opt_str_list)
 pg.build_pipeline('GURLSlooprimal', True)
 
 # runs the training process with training data
-pg.train('train_process')
+pg.run('xtr','ytr','train_process')
 
 # runs the testing process with testing data
-pg.test('test_process')
+pg.run('xte','yte','test_process')
 
 
 

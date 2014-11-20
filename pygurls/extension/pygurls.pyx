@@ -46,17 +46,17 @@ natively from within Python.
 cdef extern from "pygurls_wrapper.h" namespace "gurls":
     cdef cppclass PyGURLSWrapper:
         PyGURLSWrapper() except +
-        void load_train_data(char*,char*) except +
-        void load_test_data(char*,char*) except +
+        void add_data(char*, char*) except +     
+        void erase_data(char*) except +
+        void clear_data() except +
         void set_task_sequence(char*) except +
         void clear_task_sequence() except +
         void add_process(char*, char*) except +
         void init_processes(char*, bool) except +
         void clear_processes() except +
         void build_pipeline(char*, bool) except +
-        int train(char*) except +
-        int test(char*) except +
-        int helloWorld() except +
+        void clear_pipeline() except +
+        int  run(char*, char*, char*) except +   
         
         
 cdef class PyGURLS:
@@ -71,13 +71,16 @@ cdef class PyGURLS:
     def __dealloc__(self):
         """Destructor for extension type."""
         del self.thisptr
+        
+    def add_data(self,data_file,data_id):
+        self.thisptr.add_data(data_file,data_id)        
+        
+    def erase_data(self,data_id):
+        self.thisptr.erase_data(data_id)
     
-    def load_train_data(self,xtr_file,ytr_file):
-        self.thisptr.load_train_data(xtr_file,ytr_file)
-    
-    def load_test_data(self,xte_file,yte_file):
-        self.thisptr.load_test_data(xte_file,yte_file)
-    
+    def clear_data(self):
+        self.thisptr.clear_data()        
+        
     def set_task_sequence(self,task_list):
         str_list = [p[0]+":"+p[1] for p in task_list]    
         self.thisptr.set_task_sequence("\n".join(str_list))
@@ -97,29 +100,13 @@ cdef class PyGURLS:
     def build_pipeline(self,p_name,use_default):
         self.thisptr.build_pipeline(p_name,use_default)
     
-    def train(self,job_id):
-        return self.thisptr.train(job_id)    
-        
-    def test(self,job_id):
-        return self.thisptr.test(job_id)
+    def clear_pipeline(self):
+        self.thisptr.clear_pipeline()
     
-    def helloWorld(self):
-        self.thisptr.helloWorld()
+    def run(self,in_data_id, out_data_id, job_id):
+        return self.thisptr.run(in_data_id,out_data_id,job_id)    
+        
     
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
         
         
         
