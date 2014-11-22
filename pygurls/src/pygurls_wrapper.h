@@ -61,6 +61,8 @@ Cython doesn't support templated extension classes, so it wasn't possible to
 parametrize the wrapper using a template type. Instead, what I did was to 
 implement everything using void pointers and function pointers that would
 route the execution to a correct set of private function in the wrapper class
+
+I implemented double and float, which are the only types supported in gmath.cpp
 */
 namespace gurls {     
     
@@ -77,10 +79,9 @@ namespace gurls {
         void (gurls::PyGURLSWrapper::*pt_add_data)(char*,char*);
 
         void add_data_double (char* data_file, char* data_id); 
-        void add_data_int    (char* data_file, char* data_id);
+        void add_data_float  (char* data_file, char* data_id);
         int  run_double      (char* in_data, char* out_data, char* job_id);      
-        int  run_int         (char* in_data, char* out_data, char* job_id);     
- 
+        int  run_float       (char* in_data, char* out_data, char* job_id); 
     public:
         PyGURLSWrapper();
         PyGURLSWrapper(char* data_type);

@@ -52,7 +52,7 @@ if len(sys.argv) != 2:
         sys.exit()
 
 # python object that handles the interface with GURLS++
-pg = pygurls.PyGURLS()
+pg = pygurls.PyGURLS(data_type='double')
 
 # load data from files specified as command-line arguments
 pg.add_data(os.path.join(sys.argv[1],'Xtr.txt'),'xtr')

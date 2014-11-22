@@ -50,6 +50,7 @@ from libcpp.list cimport list
 cdef extern from "pygurls_wrapper.h" namespace "gurls":
     cdef cppclass PyGURLSWrapper:
         PyGURLSWrapper() except +               
+        PyGURLSWrapper(char*) except +
         const list[double] get_acc() except +
         void add_data(char*, char*) except +             
         void set_task_sequence(char*) except +
@@ -67,10 +68,13 @@ cdef class PyGURLS:
     wrapper class."""
     cdef PyGURLSWrapper *thisptr
         
-    def __cinit__(self,*args,**kwargs):
+    def __cinit__(self,data_type=None,*args,**kwargs):
         """Constructor for extension type."""        
         #Initializes the GURLS++ wrapper object and reference appropriately        
-        self.thisptr = new PyGURLSWrapper() 
+        if data_type != None:
+            self.thisptr = new PyGURLSWrapper(data_type) 
+        else:
+            self.thisptr = new PyGURLSWrapper() 
             
     def __dealloc__(self):
         """Destructor for extension type."""

@@ -65,10 +65,10 @@ PyGURLSWrapper::PyGURLSWrapper(char* data_type)
         this->pt_run = &gurls::PyGURLSWrapper::run_double;
         this->pt_add_data = &gurls::PyGURLSWrapper::add_data_double;
     }
-    else if (strcmp(data_type,"int") == 0)
+    else if (strcmp(data_type,"float") == 0)
     {
-        this->pt_run = &gurls::PyGURLSWrapper::run_double;
-        this->pt_add_data = &gurls::PyGURLSWrapper::add_data_int;
+        this->pt_run = &gurls::PyGURLSWrapper::run_float;
+        this->pt_add_data = &gurls::PyGURLSWrapper::add_data_float;
     }
     else
         throw std::runtime_error("Type "+std::string(data_type)+" not currently supported.");
@@ -109,9 +109,9 @@ void PyGURLSWrapper::add_data_double(char* data_file, char* data_id)
     this->data_map[data_id] = pdata; //stores the reference
 }
 
-void PyGURLSWrapper::add_data_int(char* data_file, char* data_id)
+void PyGURLSWrapper::add_data_float(char* data_file, char* data_id)
 {
-    gMat2D<int> *pdata = new gMat2D<int>();             
+    gMat2D<float> *pdata = new gMat2D<float>();             
     pdata->readCSV(data_file); //loads data from file    
     this->data_map[data_id] = pdata; //stores the reference
 }
@@ -239,13 +239,13 @@ int PyGURLSWrapper::run_double(char* in_data, char* out_data, char* job_id)
     }
 }
 
-int PyGURLSWrapper::run_int(char* in_data, char* out_data, char* job_id)
+int PyGURLSWrapper::run_float(char* in_data, char* out_data, char* job_id)
 {
     try{        
-//        this->G.run(*((gMat2D<long unsigned int>*)this->data_map[in_data]),
-//                    *((gMat2D<long unsigned int>*)this->data_map[out_data]),
-//                    *(this->opt), 
-//                    job_id);
+        this->G.run(*((gMat2D<float>*)this->data_map[in_data]),
+                    *((gMat2D<float>*)this->data_map[out_data]),
+                    *(this->opt), 
+                    job_id);
         return EXIT_SUCCESS;
     }
     catch(gException& e){

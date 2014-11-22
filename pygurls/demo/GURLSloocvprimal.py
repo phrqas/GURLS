@@ -55,7 +55,7 @@ if len(sys.argv) != 5:
         sys.exit()
 
 # python object that handles the interface with GURLS++
-pg = pygurls.PyGURLS()
+pg = pygurls.PyGURLS(data_type='double')
 #pg.clear_pipeline() 
 
 # load data from files specified as command-line arguments
