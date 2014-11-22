@@ -40,20 +40,44 @@
 using namespace std;
 using namespace gurls;
 
+/**
+ *@brief: Default constructor assumes double as the data type
+ */
 PyGURLSWrapper::PyGURLSWrapper()
 {
     this->seq = NULL;
     this->processes = NULL;    
-    this->opt = NULL;    
+    this->opt = NULL;
+
+    this->pt_run = &gurls::PyGURLSWrapper::run_double;
+    this->pt_add_data = &gurls::PyGURLSWrapper::add_data_double;
 }
 
+//TODO: fix the fact that only doubles are being called
+PyGURLSWrapper::PyGURLSWrapper(char* data_type)
+{
+    this->seq = NULL;
+    this->processes = NULL;    
+    this->opt = NULL;    
+
+    if (strcmp(data_type,"double") == 0)
+    {
+        this->pt_run = &gurls::PyGURLSWrapper::run_double;
+        this->pt_add_data = &gurls::PyGURLSWrapper::add_data_double;
+    }
+    else if (strcmp(data_type,"int") == 0)
+    {
+        this->pt_run = &gurls::PyGURLSWrapper::run_double;
+        this->pt_add_data = &gurls::PyGURLSWrapper::add_data_int;
+    }
+    else
+        throw std::runtime_error("Type "+std::string(data_type)+" not currently supported.");
+}
  
 PyGURLSWrapper::~PyGURLSWrapper()
 {
-    this->clear_pipeline();
-    this->clear_data();
+    this->clear_pipeline();    
 }
-
  
 const std::list<double> PyGURLSWrapper::get_acc()
 {
@@ -75,29 +99,23 @@ const std::list<double> PyGURLSWrapper::get_acc()
  
 void PyGURLSWrapper::add_data(char* data_file, char* data_id)
 {
+    (*this.*pt_add_data)(data_file,data_id);
+}
+
+void PyGURLSWrapper::add_data_double(char* data_file, char* data_id)
+{
     gMat2D<double> *pdata = new gMat2D<double>();             
     pdata->readCSV(data_file); //loads data from file    
     this->data_map[data_id] = pdata; //stores the reference
 }
 
- 
-void PyGURLSWrapper::clear_data()
-{    
-    // deallocates all data
-    typename std::map< char*, gMat2D<double>* >::iterator it;
-    for(it = this->data_map.begin(); it != this->data_map.end(); ++it)
-        delete this->data_map[it->first];            
-    // clears map
-    this->data_map.clear();
-}
-
- 
-void PyGURLSWrapper::erase_data(char* data_id)
+void PyGURLSWrapper::add_data_int(char* data_file, char* data_id)
 {
-    delete this->data_map[data_id]; // deallocates the data
-    this->data_map.erase(data_id); // removes the reference
+    gMat2D<int> *pdata = new gMat2D<int>();             
+    pdata->readCSV(data_file); //loads data from file    
+    this->data_map[data_id] = pdata; //stores the reference
 }
-
+ 
  
 void PyGURLSWrapper::set_task_sequence(char* seq_str)
 {
@@ -200,19 +218,63 @@ void PyGURLSWrapper::clear_pipeline()
     }
 }
 
- 
+
 int PyGURLSWrapper::run(char* in_data, char* out_data, char* job_id)
 {
-    try
-    {        
-        this->G.run(*(this->data_map[in_data]),*(this->data_map[out_data]),*(this->opt), job_id);
+    return (*this.*pt_run)(in_data,out_data,job_id);
+}
+
+int PyGURLSWrapper::run_double(char* in_data, char* out_data, char* job_id)
+{
+    try{        
+        this->G.run(*((gMat2D<double>*)this->data_map[in_data]),
+                    *((gMat2D<double>*)this->data_map[out_data]),
+                    *(this->opt), 
+                    job_id);
         return EXIT_SUCCESS;
     }
-    catch(gException& e)
-    {
+    catch(gException& e){
         cout << e.getMessage() << endl;
         return EXIT_FAILURE;
     }
 }
+
+int PyGURLSWrapper::run_int(char* in_data, char* out_data, char* job_id)
+{
+    try{        
+//        this->G.run(*((gMat2D<long unsigned int>*)this->data_map[in_data]),
+//                    *((gMat2D<long unsigned int>*)this->data_map[out_data]),
+//                    *(this->opt), 
+//                    job_id);
+        return EXIT_SUCCESS;
+    }
+    catch(gException& e){
+        cout << e.getMessage() << endl;
+        return EXIT_FAILURE;
+    }
+}
+
+//These functions would probably never be used and increase the size 
+//of the code considerably due to the lack of Cython templating
+//
+//void PyGURLSWrapper::clear_data()
+//{    
+//    // deallocates all data
+//    typename std::map< char*, gMat2D<double>* >::iterator it;
+//    for(it = this->data_map.begin(); it != this->data_map.end(); ++it)
+//        delete this->data_map[it->first];            
+//    // clears map
+//    this->data_map.clear();
+//}
+//
+// 
+//void PyGURLSWrapper::erase_data(char* data_id)
+//{
+//    delete this->data_map[data_id]; // deallocates the data
+//    this->data_map.erase(data_id); // removes the reference
+//}
+
+ 
+
 
 

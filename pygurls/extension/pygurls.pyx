@@ -51,9 +51,7 @@ cdef extern from "pygurls_wrapper.h" namespace "gurls":
     cdef cppclass PyGURLSWrapper:
         PyGURLSWrapper() except +               
         const list[double] get_acc() except +
-        void add_data(char*, char*) except +     
-        void erase_data(char*) except +
-        void clear_data() except +
+        void add_data(char*, char*) except +             
         void set_task_sequence(char*) except +
         void clear_task_sequence() except +
         void add_process(char*, char*) except +
@@ -72,7 +70,7 @@ cdef class PyGURLS:
     def __cinit__(self,*args,**kwargs):
         """Constructor for extension type."""        
         #Initializes the GURLS++ wrapper object and reference appropriately        
-        self.thisptr = new PyGURLSWrapper() #Double is default
+        self.thisptr = new PyGURLSWrapper() 
             
     def __dealloc__(self):
         """Destructor for extension type."""
@@ -85,12 +83,6 @@ cdef class PyGURLS:
         
     def add_data(self,data_file,data_id):        
         self.thisptr.add_data(data_file,data_id)        
-        
-    def erase_data(self,data_id):
-        self.thisptr.erase_data(data_id)
-    
-    def clear_data(self):
-        self.thisptr.clear_data()        
         
     def set_task_sequence(self,task_list):
         str_list = [p[0]+":"+p[1] for p in task_list]    

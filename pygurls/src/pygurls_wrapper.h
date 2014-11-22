@@ -54,30 +54,47 @@
 #include "gurls++/rlsprimal.h"
 #include "gurls++/primal.h"
 
+/**
+IMPORTANT COMMENT:
+
+Cython doesn't support templated extension classes, so it wasn't possible to
+parametrize the wrapper using a template type. Instead, what I did was to 
+implement everything using void pointers and function pointers that would
+route the execution to a correct set of private function in the wrapper class
+*/
 namespace gurls {     
     
     class PyGURLSWrapper {
     private:
         GURLS G;
         //std::map< char*, gMat2D<double>* > data_map;        
+        std::map< char*, void* > data_map;        
         OptTaskSequence *seq; // task sequence        
         GurlsOptionsList *processes; //GURLS processes
         GurlsOptionsList *opt; // options structure
+
+        int  (gurls::PyGURLSWrapper::*pt_run)(char*,char*,char*);    
+        void (gurls::PyGURLSWrapper::*pt_add_data)(char*,char*);
+
+        void add_data_double (char* data_file, char* data_id); 
+        void add_data_int    (char* data_file, char* data_id);
+        int  run_double      (char* in_data, char* out_data, char* job_id);      
+        int  run_int         (char* in_data, char* out_data, char* job_id);     
+ 
     public:
         PyGURLSWrapper();
-        ~PyGURLSWrapper();                       
+        PyGURLSWrapper(char* data_type);
+        ~PyGURLSWrapper();                           
         const std::list<double> get_acc();        
-        void add_data(char* data_file, char* data_id); 
-        void erase_data(char* data_id);          
-        void clear_data();
+        void add_data(char* data_file, char* data_id);        
         void set_task_sequence(char* seq_str);
         void clear_task_sequence();
         void init_processes(char* p_name, bool use_default);
         void add_process(char* p_name, char* opt_str);                
         void clear_processes();
         void build_pipeline(char* p_name, bool use_default);
-        void clear_pipeline();
-        int  run(char* in_data, char* out_data, char* job_id);      
+        void clear_pipeline();        
+        int run(char* in_data, char* out_data, char* job_id);      
     };
 }
 
