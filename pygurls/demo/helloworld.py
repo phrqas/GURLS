@@ -83,11 +83,10 @@ pg.build_pipeline('helloworld', True)
 # runs the training process with training data
 pg.run('xtr','ytr','train_process')
 
-# evaluates performance on training data
-pg.run('xtr','ytr','eval_perf')
-
 # evaluates performance on testing data
 pg.run('xte','yte','eval_perf')
+
+print pg.acc
 
 
 

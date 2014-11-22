@@ -48,20 +48,27 @@
 #include "gurls++/optlist.h"
 #include "gurls++/gmath.h"
 
-namespace gurls {
-       
+#include "gurls++/traintest.h"
+#include "gurls++/gprwrapper.h"
+#include "gurls++/recrlswrapper.h"
+#include "gurls++/rlsprimal.h"
+#include "gurls++/primal.h"
+
+namespace gurls {     
+    
     class PyGURLSWrapper {
     private:
         GURLS G;
-        std::map< char*, gMat2D<double>* > data_map;        
+        //std::map< char*, gMat2D<double>* > data_map;        
         OptTaskSequence *seq; // task sequence        
         GurlsOptionsList *processes; //GURLS processes
         GurlsOptionsList *opt; // options structure
     public:
         PyGURLSWrapper();
-        ~PyGURLSWrapper();
-        void add_data(char* data_file, char* data_id);     
-        void erase_data(char* data_id);
+        ~PyGURLSWrapper();                       
+        const std::list<double> get_acc();        
+        void add_data(char* data_file, char* data_id); 
+        void erase_data(char* data_id);          
         void clear_data();
         void set_task_sequence(char* seq_str);
         void clear_task_sequence();

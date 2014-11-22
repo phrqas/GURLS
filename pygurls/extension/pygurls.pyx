@@ -41,11 +41,16 @@ natively from within Python.
 
 @author: Pedro Santana (psantana@mit.edu).
 """ 
+import numpy as np
+cimport numpy as np
+from libcpp.list cimport list
+
 
 #Declares the C++ wrapper class
 cdef extern from "pygurls_wrapper.h" namespace "gurls":
     cdef cppclass PyGURLSWrapper:
-        PyGURLSWrapper() except +
+        PyGURLSWrapper() except +               
+        const list[double] get_acc() except +
         void add_data(char*, char*) except +     
         void erase_data(char*) except +
         void clear_data() except +
@@ -62,17 +67,23 @@ cdef extern from "pygurls_wrapper.h" namespace "gurls":
 cdef class PyGURLS:
     """Class that provides an Python interface to the functions in the C++
     wrapper class."""
-    cdef PyGURLSWrapper *thisptr # hold a C++ instance which we're wrapping
-    
+    cdef PyGURLSWrapper *thisptr
+        
     def __cinit__(self,*args,**kwargs):
-        """Constructor for extension type."""
-        self.thisptr = new PyGURLSWrapper() #Just declares a pointer
-    
+        """Constructor for extension type."""        
+        #Initializes the GURLS++ wrapper object and reference appropriately        
+        self.thisptr = new PyGURLSWrapper() #Double is default
+            
     def __dealloc__(self):
         """Destructor for extension type."""
         del self.thisptr
         
-    def add_data(self,data_file,data_id):
+    property acc:
+        def __get__(self):
+            cdef list[double] acc = self.thisptr.get_acc()
+            return acc    
+        
+    def add_data(self,data_file,data_id):        
         self.thisptr.add_data(data_file,data_id)        
         
     def erase_data(self,data_id):

@@ -47,37 +47,58 @@ PyGURLSWrapper::PyGURLSWrapper()
     this->opt = NULL;    
 }
 
+ 
 PyGURLSWrapper::~PyGURLSWrapper()
 {
-    //this->clear_pipeline();
-    //this->clear_data();
+    this->clear_pipeline();
+    this->clear_data();
 }
 
+ 
+const std::list<double> PyGURLSWrapper::get_acc()
+{
+    GurlsOptionsList* perf = GurlsOptionsList::dynacast(this->opt->getOpt("perf"));
+    GurlsOption *acc_opt = perf->getOpt("acc");  
+    const gMat2D<double>& acc_mat = OptMatrix<gMat2D<double> >::dynacast(acc_opt)->getValue();      
+    
+    std::cout<<"\tGot "<<acc_mat.asvector().getSize()<<" numbers in acc";
+
+    return std::list<double>(acc_mat.begin(),acc_mat.end());
+}
+
+//void PyGURLSWrapper::get_value(char* field)
+//{
+//    const gMat2D<double>& val_mat = 
+//        OptMatrix<gMat2D<double> >::dynacast(opt.getOpt(field))->getValue();
+//}
+
+ 
 void PyGURLSWrapper::add_data(char* data_file, char* data_id)
 {
-    gMat2D<double> *pdata = new gMat2D<double>(); //new container
+    gMat2D<double> *pdata = new gMat2D<double>();             
     pdata->readCSV(data_file); //loads data from file    
     this->data_map[data_id] = pdata; //stores the reference
 }
 
+ 
+void PyGURLSWrapper::clear_data()
+{    
+    // deallocates all data
+    typename std::map< char*, gMat2D<double>* >::iterator it;
+    for(it = this->data_map.begin(); it != this->data_map.end(); ++it)
+        delete this->data_map[it->first];            
+    // clears map
+    this->data_map.clear();
+}
+
+ 
 void PyGURLSWrapper::erase_data(char* data_id)
 {
     delete this->data_map[data_id]; // deallocates the data
     this->data_map.erase(data_id); // removes the reference
 }
 
-void PyGURLSWrapper::clear_data()
-{    
-    // deallocates all data
-    std::map< char*, gMat2D<double>* >::iterator it;
-    for(it = this->data_map.begin(); it != this->data_map.end(); ++it)
-        delete this->data_map[it->first];
-    
-    // clears map
-    this->data_map.clear();
-}
-
-
+ 
 void PyGURLSWrapper::set_task_sequence(char* seq_str)
 {
     char *token;
@@ -93,15 +114,17 @@ void PyGURLSWrapper::set_task_sequence(char* seq_str)
     }
 }
 
+ 
 void PyGURLSWrapper::clear_task_sequence()
 {
-     if (this->seq != NULL)
+    if (this->seq != NULL)
     {
         delete this->seq;
         this->seq = NULL;
     }
 } 
 
+ 
 void PyGURLSWrapper::add_process(char* p_name, char* opt_str)
 {
     char *token; //Tokens from the option string
@@ -132,6 +155,7 @@ void PyGURLSWrapper::add_process(char* p_name, char* opt_str)
     this->processes->addOpt(p_name,opt_process);//Adds to current process list
 }
 
+ 
 void PyGURLSWrapper::clear_processes()
 {
     if (this->processes != NULL)
@@ -141,17 +165,18 @@ void PyGURLSWrapper::clear_processes()
     }
 }
 
+ 
 void PyGURLSWrapper::init_processes(char* p_name, bool use_default)
 {
     this->clear_processes();   
     this->processes = new GurlsOptionsList(p_name, use_default);
 }
 
+ 
 void PyGURLSWrapper::build_pipeline(char* p_name, bool use_default)
 {
     if (this->seq == NULL)
         throw std::runtime_error("Empty task sequence!");
-
     if (this->processes == NULL)
         throw std::runtime_error("Empty list of processes!");
 
@@ -161,10 +186,12 @@ void PyGURLSWrapper::build_pipeline(char* p_name, bool use_default)
     this->opt->addOpt("processes", this->processes);
 }
 
+ 
 void PyGURLSWrapper::clear_pipeline()
 {
-    this->clear_task_sequence();
-    this->clear_processes();
+    //TODO: fix the segmentation fault here when we call the code twice
+    //this->clear_task_sequence();
+    //this->clear_processes();
     
     if (this->opt != NULL)
     {
@@ -173,6 +200,7 @@ void PyGURLSWrapper::clear_pipeline()
     }
 }
 
+ 
 int PyGURLSWrapper::run(char* in_data, char* out_data, char* job_id)
 {
     try
@@ -187,58 +215,4 @@ int PyGURLSWrapper::run(char* in_data, char* out_data, char* job_id)
     }
 }
 
-//int PyGURLSWrapper::helloWorld()
-//{
-//    typedef double T;
-//    
-//    gMat2D<T> Xtr, Xte, ytr, yte;
-//
-//    std::string XtrFileName = "Xtr.txt";
-//    std::string ytrFileName = "ytr_onecolumn.txt";
-//    std::string XteFileName = "Xte.txt";
-//    std::string yteFileName = "yte_onecolumn.txt";
-//
-//    try
-//    {
-//        //load the training data
-//        Xtr.readCSV(XtrFileName);
-//        ytr.readCSV(ytrFileName);
-//
-//        //load the test data
-//        Xte.readCSV(XteFileName);
-//        yte.readCSV(yteFileName);
-//
-//
-//        //train the classifer
-//        GurlsOptionsList* opt = gurls_train(Xtr, ytr);
-//
-//        //predict the labels for the test set and asses prediction accuracy
-//        gurls_test(Xte, yte, *opt);
-//
-//
-//        const gMat2D<T>& acc = opt->getOptValue<OptMatrix<gMat2D<T> > >("acc");
-//        const int max = static_cast<int>(*std::max_element(ytr.getData(), ytr.getData()+ytr.getSize()));
-//        const int accs = acc.getSize();
-//
-//        std::cout.precision(4);
-//
-//        std::cout << std::endl << "Prediction accurcay is:" << std::endl;
-//
-//        for(int i=1; i<= max; ++i)
-//            std::cout << "\tClass " << i << "\t";
-//
-//        std::cout << std::endl;
-//
-//        for(int i=0; i< accs; ++i)
-//            std::cout << "\t" << acc.getData()[i]*100.0 << "%\t";
-//
-//        std::cout << std::endl;       
-//    }
-//    catch (gException& e)
-//    {
-//        std::cout << e.getMessage() << std::endl;        
-//        return EXIT_FAILURE;
-//    }
-//    
-//    return EXIT_SUCCESS;
-//}
+
