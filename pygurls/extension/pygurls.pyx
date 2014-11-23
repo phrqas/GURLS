@@ -95,8 +95,8 @@ cdef class PyGURLS:
 #        def __get__(self):
 #            return np.array(self.thisptr.get_pred())
              
-    def add_data(self,np.ndarray[np.float64_t, ndim=2, mode='c'] mat2D, data_id):
-        cdef vector[double] vec_mat = mat2D.flatten()       
+    def add_data(self,np.ndarray[np.float64_t, ndim=2] mat2D, data_id):
+        cdef vector[double] vec_mat = mat2D.flatten('F')       
         self.thisptr.add_data(vec_mat,
                               <unsigned long>mat2D.shape[0],
                               <unsigned long>mat2D.shape[1],
