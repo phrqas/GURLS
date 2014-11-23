@@ -81,6 +81,7 @@ setup(
     author_email="psantana@mit.edu",
     description="A Python wrapper for the GURLS++ libraries.",
     long_description=read("README"), #Reads from README in the same folder
+    install_requires=['cython','numpy'],
     ext_modules = cythonize(ext_modules,                           
                             include_path=[PYGURLS_SRC,GURLSPP_INCLUDE]))
 
