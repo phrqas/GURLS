@@ -66,7 +66,7 @@ def file_list(folder,file_ext):
                     if os.path.isfile(os.path.join(folder,f)) 
                                 and f.endswith(exts)]
 
-#Do some sanity checking here to ensure that all files are in place.
+#TODO: Do some sanity checking here to ensure that all files are in place.
 
 ext_modules = [Extension("pygurls", 
                         file_list(folder='extension',file_ext='.pyx')+file_list(folder='src',file_ext='.cpp'),                        

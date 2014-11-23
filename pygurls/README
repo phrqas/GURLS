@@ -1,37 +1,56 @@
-  A Python wrapper for GURLS++.
+----------------------------------------------------------
+--------  pyGURLS, a Python wrapper for GURLS++  ---------
+----------------------------------------------------------
 
-  Copyright (c) 2014 MIT. All rights reserved.
+Table of Contents
+=================
 
-   author: Pedro Santana
-   e-mail: psantana@mit.edu
-   website: people.csail.mit.edu/psantana
+- Introduction
+- Installation
+- Documentation
 
-  Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions
-  are met:
+Introduction
+============
 
-  1. Redistributions of source code must retain the above copyright
-     notice, this list of conditions and the following disclaimer.
-  2. Redistributions in binary form must reproduce the above copyright
-     notice, this list of conditions and the following disclaimer in
-     the documentation and/or other materials provided with the
-     distribution.
-  3. Neither the name(s) of the copyright holders nor the names of its 
-     contributors or of the Massachusetts Institute of Technology may be 
-     used to endorse or promote products derived from this software
-     without specific prior written permission.
+The pyGURLS wrapper allows GURLS++ to be easily integrated as a module 
+within SciPy. It is currently implemented as a Python extension module
+written in Cython and performs data I/O using NumPy. The demos folder
+provides the user with a number of examples that demonstrate the 
+current capabilities of the package.
 
-  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
-  OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
-  AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-  POSSIBILITY OF SUCH DAMAGE.
+Installation
+============
 
+Before building pyGURLS, make sure that GURLS++ has been correctly built
+and that the shared librariy libgurls++.so can be found by ld. Also, make
+sure that you have NumPy, Scipy, and Cython installed. Let <GURLS-HOME> be 
+the folder where GURLS has been downloaded. In order to build and install 
+pyGURLS, it should be sufficient to do the following:
+
+    cd <GURLS-HOME>/pygurls
+    python setup.py build_ext --inplace
+
+This will make the Python module pygurls available for use. In order to be
+able to import it from any folder, you should add <GURLS-HOME>/pygurls
+to the environment variable PYTHONPATH.
+
+export PYTHONPATH=<GURLS-HOME>/pygurls:$PYTHONPATH
+
+If pyGURLS' Python dependencies are installed, you can easily get them using
+pip
+
+    sudo pip install -U numpy scipy cython
+
+Documentation
+=============
+
+- Webpage 
+	the fork of GURLS featuring pyGURLS can be found at https://github.com/phrqas/GURLS
+
+- Scientific Python (SciPy)
+    see http://www.scipy.org/
+
+- Cython 
+    see http://cython.org/
+    
 

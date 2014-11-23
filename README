@@ -24,6 +24,8 @@ The GRAND UNIFIED REGULARIZED LEAST SQUARES software library comprises the follo
 
 -bGURLS++, a  C++ standalone implementation of bGURLS.
 
+-pyGURLS, a Python wrapper for GURLS++ written in Cython and integrated with NumPy. 
+
 Documentation
 
 =============
