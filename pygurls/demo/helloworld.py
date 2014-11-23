@@ -2,7 +2,7 @@
 #
 #  A Python wrapper for GURLS++.
 #
-#  Copyright (c) 2015 Pedro Santana. All rights reserved.
+#  Copyright (c) 2014 MIT. All rights reserved.
 #
 #   author: Pedro Santana
 #   e-mail: psantana@mit.edu
@@ -18,7 +18,8 @@
 #     notice, this list of conditions and the following disclaimer in
 #     the documentation and/or other materials provided with the
 #     distribution.
-#  3. Neither the name Lily nor the names of its contributors may be
+#  3. Neither the name(s) of the copyright holders nor the names of its 
+#     contributors or of the Massachusetts Institute of Technology may be 
 #     used to endorse or promote products derived from this software
 #     without specific prior written permission.
 #
