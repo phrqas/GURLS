@@ -43,7 +43,8 @@ natively from within Python.
 """ 
 import numpy as np
 cimport numpy as np
-from libcpp.list cimport list
+from cython.view cimport array as cvarray
+from libcpp.vector cimport vector
 
 
 #Declares the C++ wrapper class
@@ -51,8 +52,12 @@ cdef extern from "pygurls_wrapper.h" namespace "gurls":
     cdef cppclass PyGURLSWrapper:
         PyGURLSWrapper() except +               
         PyGURLSWrapper(char*) except +
-        const list[double] get_acc() except +
-        void add_data(char*, char*) except +             
+        const vector[double] get_acc() except +
+#        const vector[double] get_pred() except +
+        void add_data(vector[double]&, unsigned long, unsigned long, char*) except +             
+        void load_data(char*, char*) except +             
+        vector[double] get_data_vec(char*) except +
+        void erase_data(char*) except +
         void set_task_sequence(char*) except +
         void clear_task_sequence() except +
         void add_process(char*, char*) except +
@@ -61,6 +66,8 @@ cdef extern from "pygurls_wrapper.h" namespace "gurls":
         void build_pipeline(char*, bool) except +
         void clear_pipeline() except +
         int  run(char*, char*, char*) except +   
+        unsigned long get_num_rows() except +
+        unsigned long get_num_cols() except +
         
         
 cdef class PyGURLS:
@@ -82,11 +89,31 @@ cdef class PyGURLS:
         
     property acc:
         def __get__(self):
-            cdef list[double] acc = self.thisptr.get_acc()
-            return acc    
-        
-    def add_data(self,data_file,data_id):        
-        self.thisptr.add_data(data_file,data_id)        
+            return np.array(self.thisptr.get_acc())
+            
+#    property pred:
+#        def __get__(self):
+#            return np.array(self.thisptr.get_pred())
+             
+    def add_data(self,np.ndarray[np.float64_t, ndim=2, mode='c'] mat2D, data_id):
+        cdef vector[double] vec_mat = mat2D.flatten()       
+        self.thisptr.add_data(vec_mat,
+                              <unsigned long>mat2D.shape[0],
+                              <unsigned long>mat2D.shape[1],
+                              data_id)             
+             
+    def load_data(self,data_file,data_id):        
+        self.thisptr.load_data(data_file,data_id)     
+
+    def get_data(self,data_id):
+        cdef rows, cols
+        vec_mat = np.array(self.thisptr.get_data_vec(data_id))
+        rows = self.thisptr.get_num_rows();
+        cols = self.thisptr.get_num_cols();        
+        return vec_mat.reshape((rows,cols),order='F')
+
+    def erase_data(self,data_id):
+        self.thisptr.erase_data(data_id)        
         
     def set_task_sequence(self,task_list):
         str_list = [p[0]+":"+p[1] for p in task_list]    

@@ -50,10 +50,12 @@ PyGURLSWrapper::PyGURLSWrapper()
     this->opt = NULL;
 
     this->pt_run = &gurls::PyGURLSWrapper::run_double;
-    this->pt_add_data = &gurls::PyGURLSWrapper::add_data_double;
+    this->pt_load_data = &gurls::PyGURLSWrapper::load_data_double;
 }
 
-//TODO: fix the fact that only doubles are being called
+/**
+ *@brief: Typed constructor selects correct data-handling functions.
+ */
 PyGURLSWrapper::PyGURLSWrapper(char* data_type)
 {
     this->seq = NULL;
@@ -63,12 +65,12 @@ PyGURLSWrapper::PyGURLSWrapper(char* data_type)
     if (strcmp(data_type,"double") == 0)
     {
         this->pt_run = &gurls::PyGURLSWrapper::run_double;
-        this->pt_add_data = &gurls::PyGURLSWrapper::add_data_double;
+        this->pt_load_data = &gurls::PyGURLSWrapper::load_data_double;
     }
     else if (strcmp(data_type,"float") == 0)
     {
         this->pt_run = &gurls::PyGURLSWrapper::run_float;
-        this->pt_add_data = &gurls::PyGURLSWrapper::add_data_float;
+        this->pt_load_data = &gurls::PyGURLSWrapper::load_data_float;
     }
     else
         throw std::runtime_error("Type "+std::string(data_type)+" not currently supported.");
@@ -79,43 +81,72 @@ PyGURLSWrapper::~PyGURLSWrapper()
     this->clear_pipeline();    
 }
  
-const std::list<double> PyGURLSWrapper::get_acc()
+const std::vector<double> PyGURLSWrapper::get_acc()
 {
     GurlsOptionsList* perf = GurlsOptionsList::dynacast(this->opt->getOpt("perf"));
     GurlsOption *acc_opt = perf->getOpt("acc");  
     const gMat2D<double>& acc_mat = OptMatrix<gMat2D<double> >::dynacast(acc_opt)->getValue();      
     
-    std::cout<<"\tGot "<<acc_mat.asvector().getSize()<<" numbers in acc";
+//    std::cout<<"\tGot "<<acc_mat.asvector().getSize()<<" numbers in acc";
 
-    return std::list<double>(acc_mat.begin(),acc_mat.end());
+    return std::vector<double>(acc_mat.begin(),acc_mat.end());
 }
 
-//void PyGURLSWrapper::get_value(char* field)
+//const std::vector<double> PyGURLSWrapper::get_pred()
+//{
+//    const gMat2D<double>& pred_mat 
+//        = OptMatrix<gMat2D<double> >::dynacast(opt.getOpt("pred"))->getValue();
+//
+//    return
+//
+//}
+
+//void PyGURLSWrapper::get_field_double(char* field)
 //{
 //    const gMat2D<double>& val_mat = 
 //        OptMatrix<gMat2D<double> >::dynacast(opt.getOpt(field))->getValue();
 //}
 
  
-void PyGURLSWrapper::add_data(char* data_file, char* data_id)
+void PyGURLSWrapper::load_data(char* data_file, char* data_id)
 {
-    (*this.*pt_add_data)(data_file,data_id);
+    (*this.*pt_load_data)(data_file,data_id);
 }
 
-void PyGURLSWrapper::add_data_double(char* data_file, char* data_id)
+void PyGURLSWrapper::load_data_double(char* data_file, char* data_id)
 {
     gMat2D<double> *pdata = new gMat2D<double>();             
     pdata->readCSV(data_file); //loads data from file    
     this->data_map[data_id] = pdata; //stores the reference
 }
 
-void PyGURLSWrapper::add_data_float(char* data_file, char* data_id)
+void PyGURLSWrapper::load_data_float(char* data_file, char* data_id)
 {
     gMat2D<float> *pdata = new gMat2D<float>();             
     pdata->readCSV(data_file); //loads data from file    
     this->data_map[data_id] = pdata; //stores the reference
 }
  
+void PyGURLSWrapper::add_data(std::vector<double>& vec_dat, unsigned long rows, 
+                                unsigned long cols,char* data_id)
+{
+    gMat2D<double> *pdata = new gMat2D<double>(vec_dat.data(),rows,cols,true);                 
+    this->data_map[data_id] = pdata; //stores the reference
+}
+
+std::vector<double> PyGURLSWrapper::get_data_vec(char* data_id)
+{
+    gMat2D<double> *pdata = (gMat2D<double>*) this->data_map[data_id];
+    this->num_mat_rows = pdata->rows();       
+    this->num_mat_cols = pdata->cols();
+    return std::vector<double>(pdata->begin(),pdata->end());    
+}
+
+void PyGURLSWrapper::erase_data(char* data_id)
+{    
+    delete this->data_map[data_id]; //deallocates the data
+    this->data_map.erase(data_id); 
+}
  
 void PyGURLSWrapper::set_task_sequence(char* seq_str)
 {
@@ -253,28 +284,6 @@ int PyGURLSWrapper::run_float(char* in_data, char* out_data, char* job_id)
         return EXIT_FAILURE;
     }
 }
-
-//These functions would probably never be used and increase the size 
-//of the code considerably due to the lack of Cython templating
-//
-//void PyGURLSWrapper::clear_data()
-//{    
-//    // deallocates all data
-//    typename std::map< char*, gMat2D<double>* >::iterator it;
-//    for(it = this->data_map.begin(); it != this->data_map.end(); ++it)
-//        delete this->data_map[it->first];            
-//    // clears map
-//    this->data_map.clear();
-//}
-//
-// 
-//void PyGURLSWrapper::erase_data(char* data_id)
-//{
-//    delete this->data_map[data_id]; // deallocates the data
-//    this->data_map.erase(data_id); // removes the reference
-//}
-
- 
 
 
 

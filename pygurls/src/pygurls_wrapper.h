@@ -68,26 +68,34 @@ namespace gurls {
     
     class PyGURLSWrapper {
     private:
-        GURLS G;
-        //std::map< char*, gMat2D<double>* > data_map;        
-        std::map< char*, void* > data_map;        
+        GURLS G;               
+        // void pointer to support multiple data input types
+        std::map< char*, void* > data_map;
         OptTaskSequence *seq; // task sequence        
         GurlsOptionsList *processes; //GURLS processes
         GurlsOptionsList *opt; // options structure
+    
+        unsigned long num_mat_rows; //# of rows from last conversion
+        unsigned long num_mat_cols; //# of cols from last conversion
 
         int  (gurls::PyGURLSWrapper::*pt_run)(char*,char*,char*);    
-        void (gurls::PyGURLSWrapper::*pt_add_data)(char*,char*);
+        void (gurls::PyGURLSWrapper::*pt_load_data)(char*,char*);
 
-        void add_data_double (char* data_file, char* data_id); 
-        void add_data_float  (char* data_file, char* data_id);
+        void load_data_double (char* data_file, char* data_id); 
+        void load_data_float  (char* data_file, char* data_id);
         int  run_double      (char* in_data, char* out_data, char* job_id);      
         int  run_float       (char* in_data, char* out_data, char* job_id); 
     public:
         PyGURLSWrapper();
         PyGURLSWrapper(char* data_type);
         ~PyGURLSWrapper();                           
-        const std::list<double> get_acc();        
-        void add_data(char* data_file, char* data_id);        
+        const std::vector<double> get_acc();    
+//        const std::vector<double> get_pred();                
+        void add_data(std::vector<double>& vec_dat, unsigned long rows, 
+                        unsigned long cols, char* data_id);        
+        void load_data(char* data_file, char* data_id);    
+        void erase_data(char* data_id);    
+        std::vector<double> get_data_vec(char* data_id);
         void set_task_sequence(char* seq_str);
         void clear_task_sequence();
         void init_processes(char* p_name, bool use_default);
@@ -96,6 +104,9 @@ namespace gurls {
         void build_pipeline(char* p_name, bool use_default);
         void clear_pipeline();        
         int run(char* in_data, char* out_data, char* job_id);      
+
+        unsigned long get_num_rows(){return this->num_mat_rows;}
+        unsigned long get_num_cols(){return this->num_mat_cols;}
     };
 }
 
