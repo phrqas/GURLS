@@ -110,13 +110,13 @@ pg.build_pipeline('matlab_demo', True)
 pg.run('Xtrain','Ytrain','train_process')
 # evaluates performance on testing data
 pg.run('Xtest','Ytest','eval_perf')
-acc_uncenter = pg.acc
+acc_uncenter = pg.get_option_field('perf','acc')
 
 # runs the training process with training data
 pg.run('Xtrain_center','Ytrain_center','train_process')
 # evaluates performance on testing data
 pg.run('Xtest_center','Ytest_center','eval_perf')
-acc_center = pg.acc
+acc_center = pg.get_option_field('perf','acc')
 
 print "(Uncentered data) Accuracy on testing set= %.6f"%(acc_uncenter)
 print "(Centered data) Accuracy on testing set= %.6f"%(acc_center)

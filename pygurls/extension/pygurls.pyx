@@ -53,8 +53,8 @@ cdef extern from "pygurls_wrapper.h" namespace "gurls":
     cdef cppclass PyGURLSWrapper:
         PyGURLSWrapper() except +               
         PyGURLSWrapper(char*) except +
-        const vector[double] get_acc() except +
-        const vector[double] get_pred() except +
+        const vector[double] get_opt_field(char*,char*) except +        
+        const vector[double] get_field(char*) except +
         void add_data(vector[double]&, unsigned long, unsigned long, char*) except +             
         void load_data(char*, char*) except +             
         vector[double] get_data_vec(char*) except +
@@ -95,16 +95,14 @@ cdef class PyGURLS:
         if rows>1 and cols>1: 
             return vec_mat.reshape((rows,cols),order='F')
         else:
-            return vec_mat
+            return vec_mat                            
     
-    property acc:
-        def __get__(self):            
-            return self._gMat2D_to_np(self.thisptr.get_acc())
-                        
-    property pred:
-        def __get__(self):            
-            return self._gMat2D_to_np(self.thisptr.get_pred())
-                             
+    def get_field(self,field):            
+        return self._gMat2D_to_np(self.thisptr.get_field(field))
+    
+    def get_option_field(self,option,field):
+        return self._gMat2D_to_np(self.thisptr.get_opt_field(option,field))
+                         
     def add_data(self,np.ndarray[np.float64_t, ndim=2] mat2D, data_id):
         cdef vector[double] vec_mat = mat2D.flatten('F')       
         self.thisptr.add_data(vec_mat,
@@ -124,7 +122,7 @@ cdef class PyGURLS:
         else:
             data_dic = scipy.io.loadmat(mat_file,appendmat=True)        
         return data_dic 
-
+    
     def get_data(self,data_id):
         return self._gMat2D_to_np(self.thisptr.get_data_vec(data_id))        
         

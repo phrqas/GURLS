@@ -91,6 +91,7 @@ namespace gurls {
         PyGURLSWrapper();
         PyGURLSWrapper(char* data_type);
         ~PyGURLSWrapper();             
+        const std::vector<double> get_field(char* field);
         const std::vector<double> get_opt_field(char* option,char* field);                      
         const std::vector<double> get_pred();                
         void add_data(std::vector<double>& vec_dat, unsigned long rows, 

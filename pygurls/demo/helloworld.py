@@ -55,10 +55,10 @@ if len(sys.argv) != 2:
 pg = pygurls.PyGURLS(data_type='double')
 
 # load data from files specified as command-line arguments
-pg.add_data(os.path.join(sys.argv[1],'Xtr.txt'),'xtr')
-pg.add_data(os.path.join(sys.argv[1],'ytr_onecolumn.txt'),'ytr')
-pg.add_data(os.path.join(sys.argv[1],'Xte.txt'),'xte')
-pg.add_data(os.path.join(sys.argv[1],'yte_onecolumn.txt'),'yte')
+pg.load_data(os.path.join(sys.argv[1],'Xtr.txt'),'xtr')
+pg.load_data(os.path.join(sys.argv[1],'ytr_onecolumn.txt'),'ytr')
+pg.load_data(os.path.join(sys.argv[1],'Xte.txt'),'xte')
+pg.load_data(os.path.join(sys.argv[1],'yte_onecolumn.txt'),'yte')
 
 # specify the task sequence
 task_list = [['kernel','linear'], ['paramsel','loocvdual'],
@@ -86,7 +86,8 @@ pg.run('xtr','ytr','train_process')
 # evaluates performance on testing data
 pg.run('xte','yte','eval_perf')
 
-print pg.acc
+p = pg.get_field('pred')
+print p
 
 
 

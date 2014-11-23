@@ -126,6 +126,13 @@ void PyGURLSWrapper::erase_data(char* data_id)
     this->data_map.erase(data_id); 
 }
 
+const std::vector<double> PyGURLSWrapper::get_field(char* field)
+{
+    const gMat2D<double>& mat 
+        = OptMatrix<gMat2D<double> >::dynacast(this->opt->getOpt(field))->getValue();
+    return export_gmat(mat);        
+}
+
 const std::vector<double> PyGURLSWrapper::get_opt_field(char* option,char* field)
 {
     GurlsOptionsList* perf = GurlsOptionsList::dynacast(this->opt->getOpt(option));
@@ -134,13 +141,6 @@ const std::vector<double> PyGURLSWrapper::get_opt_field(char* option,char* field
     return export_gmat(mat);        
 }
 
-const std::vector<double> PyGURLSWrapper::get_pred()
-{
-    const gMat2D<double>& pred_mat 
-        = OptMatrix<gMat2D<double> >::dynacast(this->opt->getOpt("pred"))->getValue();
-    return export_gmat(pred_mat);        
-}
- 
 void PyGURLSWrapper::set_task_sequence(char* seq_str)
 {
     char *token;
