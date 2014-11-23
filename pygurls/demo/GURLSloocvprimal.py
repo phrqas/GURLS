@@ -59,10 +59,10 @@ pg = pygurls.PyGURLS(data_type='double')
 #pg.clear_pipeline() 
 
 # load data from files specified as command-line arguments
-pg.add_data(sys.argv[1],'xtr')
-pg.add_data(sys.argv[2],'xte')
-pg.add_data(sys.argv[3],'ytr')
-pg.add_data(sys.argv[4],'yte')
+pg.load_data(sys.argv[1],'xtr')
+pg.load_data(sys.argv[2],'xte')
+pg.load_data(sys.argv[3],'ytr')
+pg.load_data(sys.argv[4],'yte')
 
 # specify the task sequence
 task_list = [['paramsel','loocvprimal'],
@@ -92,11 +92,3 @@ pg.run('xtr','ytr','train_process')
 
 # runs the testing process with testing data
 pg.run('xte','yte','test_process')
-
-
-
-
-
-
-
-

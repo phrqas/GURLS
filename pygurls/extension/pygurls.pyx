@@ -112,18 +112,18 @@ cdef class PyGURLS:
                               <unsigned long>mat2D.shape[1],
                               data_id)             
              
-    def load_data(self,data_file,data_id):        
-        if data_file.endswith('.mat'): #MATLAB import
-            data_dic = scipy.io.loadmat(data_file)
-            var_loaded = []
-            for var_name, mat in data_dic.iteritems():
-                if not var_name.startswith('__'): #Ignores hidden variables
-                    self.add_data(mat.astype(np.dtype('float64'),copy=False),
-                                  var_name)
-                    var_loaded.append(var_name)
-            return var_loaded #Returns the names of the variables
-        else: #Calls the C++ loading function for everything else                        
-            self.thisptr.load_data(data_file,data_id)         
+    def load_data(self,data_file,data_id):                
+        #Calls the C++ loading function for everything else                        
+        self.thisptr.load_data(data_file,data_id)         
+
+    def import_mat_file(self,mat_file,var_names=[]):           
+        #MATLAB import
+        if len(var_names)>0:
+            data_dic = scipy.io.loadmat(mat_file,appendmat=True,
+                                        variable_names=var_names)
+        else:
+            data_dic = scipy.io.loadmat(mat_file,appendmat=True)        
+        return data_dic 
 
     def get_data(self,data_id):
         return self._gMat2D_to_np(self.thisptr.get_data_vec(data_id))        
