@@ -134,11 +134,23 @@ const std::vector<double> PyGURLSWrapper::get_field(char* field)
 }
 
 const std::vector<double> PyGURLSWrapper::get_opt_field(char* option,char* field)
-{
+{    
     GurlsOptionsList* perf = GurlsOptionsList::dynacast(this->opt->getOpt(option));
     GurlsOption *perf_field = perf->getOpt(field);  
-    const gMat2D<double>& mat = OptMatrix<gMat2D<double> >::dynacast(perf_field)->getValue();          
-    return export_gmat(mat);        
+    
+    //Hack to deal with the fact that sigma is stored as a double, rather
+    //than a gMat2D.
+    if((strcmp(option,"paramsel")==0)&&(strcmp(field,"sigma")==0))
+    {
+        double sigma = this->opt->getOptValue<OptNumber>("paramsel.sigma");
+        gMat2D<double> *pmat = new gMat2D<double>(&sigma,1,1,true);                 
+        return export_gmat(*pmat);        
+    }
+    else
+    {
+        const gMat2D<double>& mat = OptMatrix<gMat2D<double> >::dynacast(perf_field)->getValue();          
+        return export_gmat(mat);        
+    }
 }
 
 void PyGURLSWrapper::set_task_sequence(char* seq_str)
