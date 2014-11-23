@@ -90,7 +90,7 @@ namespace gurls {
         PyGURLSWrapper(char* data_type);
         ~PyGURLSWrapper();                           
         const std::vector<double> get_acc();    
-//        const std::vector<double> get_pred();                
+        const std::vector<double> get_pred();                
         void add_data(std::vector<double>& vec_dat, unsigned long rows, 
                         unsigned long cols, char* data_id);        
         void load_data(char* data_file, char* data_id);    

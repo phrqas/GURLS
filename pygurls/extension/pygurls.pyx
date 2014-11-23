@@ -53,7 +53,7 @@ cdef extern from "pygurls_wrapper.h" namespace "gurls":
         PyGURLSWrapper() except +               
         PyGURLSWrapper(char*) except +
         const vector[double] get_acc() except +
-#        const vector[double] get_pred() except +
+        const vector[double] get_pred() except +
         void add_data(vector[double]&, unsigned long, unsigned long, char*) except +             
         void load_data(char*, char*) except +             
         vector[double] get_data_vec(char*) except +
@@ -86,15 +86,21 @@ cdef class PyGURLS:
     def __dealloc__(self):
         """Destructor for extension type."""
         del self.thisptr
-        
+    
+    def _gMat2D_to_np(self,gMat2D_vec):
+        vec_mat = np.array(gMat2D_vec)
+        rows = self.thisptr.get_num_rows();
+        cols = self.thisptr.get_num_cols();        
+        return vec_mat.reshape((rows,cols),order='F')
+    
     property acc:
-        def __get__(self):
-            return np.array(self.thisptr.get_acc())
-            
-#    property pred:
-#        def __get__(self):
-#            return np.array(self.thisptr.get_pred())
-             
+        def __get__(self):            
+            return self._gMat2D_to_np(self.thisptr.get_acc())
+                        
+    property pred:
+        def __get__(self):            
+            return self._gMat2D_to_np(self.thisptr.get_pred())
+                             
     def add_data(self,np.ndarray[np.float64_t, ndim=2] mat2D, data_id):
         cdef vector[double] vec_mat = mat2D.flatten('F')       
         self.thisptr.add_data(vec_mat,
@@ -106,12 +112,8 @@ cdef class PyGURLS:
         self.thisptr.load_data(data_file,data_id)     
 
     def get_data(self,data_id):
-        cdef rows, cols
-        vec_mat = np.array(self.thisptr.get_data_vec(data_id))
-        rows = self.thisptr.get_num_rows();
-        cols = self.thisptr.get_num_cols();        
-        return vec_mat.reshape((rows,cols),order='F')
-
+        return self._gMat2D_to_np(self.thisptr.get_data_vec(data_id))        
+        
     def erase_data(self,data_id):
         self.thisptr.erase_data(data_id)        
         
