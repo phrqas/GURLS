@@ -87,6 +87,12 @@ PyGURLSWrapper::~PyGURLSWrapper()
 //        OptMatrix<gMat2D<double> >::dynacast(opt.getOpt(field))->getValue();
 //}
 
+const std::vector<double> PyGURLSWrapper::export_gmat(const gMat2D<double>& mat)
+{
+    this->num_mat_rows = mat.rows();       
+    this->num_mat_cols = mat.cols();
+    return std::vector<double>(mat.begin(),mat.end());
+}
  
 void PyGURLSWrapper::load_data(char* data_file, char* data_id)
 {
@@ -117,9 +123,7 @@ void PyGURLSWrapper::add_data(std::vector<double>& vec_dat, unsigned long rows,
 std::vector<double> PyGURLSWrapper::get_data_vec(char* data_id)
 {
     gMat2D<double> *pdata = (gMat2D<double>*) this->data_map[data_id];
-    this->num_mat_rows = pdata->rows();       
-    this->num_mat_cols = pdata->cols();
-    return std::vector<double>(pdata->begin(),pdata->end());    
+    return export_gmat(*pdata);    
 }
 
 void PyGURLSWrapper::erase_data(char* data_id)
@@ -128,23 +132,20 @@ void PyGURLSWrapper::erase_data(char* data_id)
     this->data_map.erase(data_id); 
 }
 
+
 const std::vector<double> PyGURLSWrapper::get_acc()
 {
     GurlsOptionsList* perf = GurlsOptionsList::dynacast(this->opt->getOpt("perf"));
     GurlsOption *acc_opt = perf->getOpt("acc");  
     const gMat2D<double>& acc_mat = OptMatrix<gMat2D<double> >::dynacast(acc_opt)->getValue();          
-    this->num_mat_rows = acc_mat.rows();       
-    this->num_mat_cols = acc_mat.cols();
-    return std::vector<double>(acc_mat.begin(),acc_mat.end());
+    return export_gmat(acc_mat);        
 }
 
 const std::vector<double> PyGURLSWrapper::get_pred()
 {
     const gMat2D<double>& pred_mat 
         = OptMatrix<gMat2D<double> >::dynacast(this->opt->getOpt("pred"))->getValue();
-    this->num_mat_rows = pred_mat.rows();       
-    this->num_mat_cols = pred_mat.cols();
-    return std::vector<double>(pred_mat.begin(),pred_mat.end());
+    return export_gmat(pred_mat);        
 }
  
 void PyGURLSWrapper::set_task_sequence(char* seq_str)

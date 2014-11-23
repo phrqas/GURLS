@@ -85,6 +85,8 @@ namespace gurls {
         void load_data_float  (char* data_file, char* data_id);
         int  run_double      (char* in_data, char* out_data, char* job_id);      
         int  run_float       (char* in_data, char* out_data, char* job_id); 
+
+        const std::vector<double> export_gmat(const gMat2D<double>& mat);
     public:
         PyGURLSWrapper();
         PyGURLSWrapper(char* data_type);
