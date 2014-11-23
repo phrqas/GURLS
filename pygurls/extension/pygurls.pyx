@@ -43,6 +43,7 @@ natively from within Python.
 """ 
 import numpy as np
 cimport numpy as np
+import scipy.io
 from cython.view cimport array as cvarray
 from libcpp.vector cimport vector
 
@@ -90,8 +91,11 @@ cdef class PyGURLS:
     def _gMat2D_to_np(self,gMat2D_vec):
         vec_mat = np.array(gMat2D_vec)
         rows = self.thisptr.get_num_rows();
-        cols = self.thisptr.get_num_cols();        
-        return vec_mat.reshape((rows,cols),order='F')
+        cols = self.thisptr.get_num_cols();       
+        if rows>1 and cols>1: 
+            return vec_mat.reshape((rows,cols),order='F')
+        else:
+            return vec_mat
     
     property acc:
         def __get__(self):            
@@ -109,7 +113,17 @@ cdef class PyGURLS:
                               data_id)             
              
     def load_data(self,data_file,data_id):        
-        self.thisptr.load_data(data_file,data_id)     
+        if data_file.endswith('.mat'): #MATLAB import
+            data_dic = scipy.io.loadmat(data_file)
+            var_loaded = []
+            for var_name, mat in data_dic.iteritems():
+                if not var_name.startswith('__'): #Ignores hidden variables
+                    self.add_data(mat.astype(np.dtype('float64'),copy=False),
+                                  var_name)
+                    var_loaded.append(var_name)
+            return var_loaded #Returns the names of the variables
+        else: #Calls the C++ loading function for everything else                        
+            self.thisptr.load_data(data_file,data_id)         
 
     def get_data(self,data_id):
         return self._gMat2D_to_np(self.thisptr.get_data_vec(data_id))        

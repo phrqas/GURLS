@@ -38,50 +38,64 @@
 """
 A Python wrapper for GURLS++
 
-Setup file for compiling the project with Cython.
+An implementation of helloworld.cpp using PyGURLS
 
 @author: Pedro Santana (psantana@mit.edu).
-""" 
+"""
+import pygurls
+import sys
 import os
-from setuptools import setup, Extension
-from Cython.Build import cythonize
 
-CWD = os.path.abspath(os.path.dirname(__file__))
-GURLS_ROOT = os.path.split(CWD)[0]
+#Checks path 
+if len(sys.argv) != 2:           
+        print "Usage: "+sys.argv[0]+" <path to gurls++ data directory>"        
+        sys.exit()
 
-PYGURLS_SRC = os.path.join(CWD,'src')
-GURLSPP_INCLUDE = os.path.join(GURLS_ROOT,'gurls++/include')
-GURLSPP_LIB = os.path.join(GURLS_ROOT,'build/lib')
+# python object that handles the interface with GURLS++
+pg = pygurls.PyGURLS(data_type='double')
+
+# load data from files specified as command-line arguments
+var_names = pg.load_data(os.path.join(sys.argv[1],'ps1-dataset.mat'),'')
+print "Loaded variables: "+str(var_names)
+
+#pg.load_data(os.path.join(sys.argv[1],'ytr_onecolumn.txt'),'ytr')
+#pg.load_data(os.path.join(sys.argv[1],'Xte.txt'),'xte')
+#pg.load_data(os.path.join(sys.argv[1],'yte_onecolumn.txt'),'yte')
+#
+## specify the task sequence
+#task_list = [['kernel','linear'], ['paramsel','loocvdual'],
+#             ['optimizer','rlsdual'],['pred','dual'],['perf','macroavg']]
+#
+#pg.set_task_sequence(task_list)
+#
+## initializes the list of processes with default options
+#pg.init_processes('processes',True)
+#
+## defines instructions for training
+#opt_str_list = ['computeNsave','computeNsave','computeNsave','ignore','ignore']
+#pg.add_process('train_process',opt_str_list)
+#
+## defines instructions for evaluatng performance
+#opt_str_list = ['load','load','load','computeNsave','computeNsave']
+#pg.add_process('eval_perf',opt_str_list)
+#
+## builds the GURLS++ optimization pipeline
+#pg.build_pipeline('helloworld', True)
+#
+## runs the training process with training data
+#pg.run('xtr','ytr','train_process')
+#
+## evaluates performance on testing data
+#pg.run('xte','yte','eval_perf')
+#
+#p = pg.pred
+#print p
+#
 
 
-def read(fname):
-    return open(os.path.join(CWD, fname)).read()
 
-def file_list(folder,file_ext):  
-    """Returns a list of files"""
-    exts = (file_ext) if not isinstance(file_ext,(list,tuple)) else file_ext        
-    return [os.path.join(folder,f)
-                for f in os.listdir(folder) 
-                    if os.path.isfile(os.path.join(folder,f)) 
-                                and f.endswith(exts)]
 
-#Do some sanity checking here to ensure that all files are in place.
 
-ext_modules = [Extension("pygurls", 
-                        file_list(folder='extension',file_ext='.pyx')+file_list(folder='src',file_ext='.cpp'),                        
-                        include_dirs = [PYGURLS_SRC,GURLSPP_INCLUDE],                       
-                        library_dirs = [GURLSPP_LIB],
-                        libraries=["gurls++"],
-                        language = "c++")]
 
-setup(
-    name="PyGURLS++",
-    version="0.0.1",
-    author="Pedro Santana",
-    author_email="psantana@mit.edu",
-    description="A Python wrapper for the GURLS++ libraries.",
-    long_description=read("README"), #Reads from README in the same folder
-    install_requires=['cython','numpy','scipy'],
-    ext_modules = cythonize(ext_modules,                           
-                            include_path=[PYGURLS_SRC,GURLSPP_INCLUDE]))
+
 
