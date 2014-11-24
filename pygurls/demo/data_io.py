@@ -70,10 +70,10 @@ yte = pg.get_data('yte')
 
 print "Concatenating training and testing data\n"
 x_total = np.vstack((xtr,xte)) #Stacks rows
-y_total = np.vstack((ytr,yte)) #Concatenates the vector
+y_total = np.concatenate((ytr,yte)) #Concatenates the vector
 
 print "Total input data (rows,cols)=(%d,%d)"%(x_total.shape[0],x_total.shape[1])
-print "Total output data (rows,cols)=(%d,%d)\n"%(y_total.shape[0],y_total.shape[1])
+print "Total output data (rows)=(%d)\n"%(y_total.shape[0])
 
 print "Adding concatenated NumPy matrices into GURLS++"
 pg.add_data(x_total,'x_total')

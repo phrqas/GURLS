@@ -99,8 +99,11 @@ cdef class PyGURLS:
         
         vec_mat = np.array(gMat2D_vec)
         rows = self.thisptr.get_num_rows();
-        cols = self.thisptr.get_num_cols();       
-        return vec_mat.reshape((rows,cols),order='F')        
+        cols = self.thisptr.get_num_cols();         
+        if (rows > 1) and (cols > 1):
+            return vec_mat.reshape((rows,cols),order='F')        
+        else:
+            return vec_mat
     
     def get_field(self,field):    
         """Return field within a GurlsOptionsList structure."""        
@@ -112,13 +115,15 @@ cdef class PyGURLS:
         
         return self._gMat2D_to_np(self.thisptr.get_opt_field(option,field))
                          
-    def add_data(self,np.ndarray[np.float64_t, ndim=2] mat2D, data_id):
+    def add_data(self,mat2D, data_id):
         """Add 2D NumPy array to GURLS++ pipeline with id=data_id."""
         
-        cdef vector[double] vec_mat = mat2D.flatten('F')       
+        mat = np.reshape(mat2D,(mat2D.shape[0],1)) if len(mat2D.shape) == 1 else mat2D
+                
+        cdef vector[double] vec_mat = mat.flatten('F')       
         self.thisptr.add_data(vec_mat,
-                              <unsigned long>mat2D.shape[0],
-                              <unsigned long>mat2D.shape[1],
+                              <unsigned long>mat.shape[0],
+                              <unsigned long>mat.shape[1],
                               data_id)             
              
     def load_data(self,data_file,data_id):                
