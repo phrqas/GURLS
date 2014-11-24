@@ -42,9 +42,6 @@
 using namespace std;
 using namespace gurls;
 
-/**
- *@brief: Default constructor assumes double as the data type
- */
 PyGURLSWrapper::PyGURLSWrapper()
 {
     this->seq = NULL;
@@ -55,9 +52,6 @@ PyGURLSWrapper::PyGURLSWrapper()
     this->pt_load_data = &gurls::PyGURLSWrapper::load_data_double;
 }
 
-/**
- *@brief: Typed constructor selects correct data-handling functions.
- */
 PyGURLSWrapper::PyGURLSWrapper(char* data_type)
 {
     this->seq = NULL;
@@ -244,11 +238,7 @@ void PyGURLSWrapper::build_pipeline(char* p_name, bool use_default)
 
  
 void PyGURLSWrapper::clear_pipeline()
-{
-    //TODO: fix the segmentation fault here when we call the code twice
-    //this->clear_task_sequence();
-    //this->clear_processes();
-    
+{       
     if (this->opt != NULL)
     {
         delete this->opt;

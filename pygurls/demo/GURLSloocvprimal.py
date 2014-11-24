@@ -37,9 +37,7 @@
 #  POSSIBILITY OF SUCH DAMAGE.
 #
 """
-A Python wrapper for GURLS++
-
-An implementation of GURLSloocvprimal.cpp using PyGURLS
+An implementation of GURLSloocvprimal.cpp using PyGURLS.
 
 @author: Pedro Santana (psantana@mit.edu).
 """

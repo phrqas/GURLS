@@ -37,8 +37,6 @@
 #  POSSIBILITY OF SUCH DAMAGE.
 #
 """
-A Python wrapper for GURLS++
-
 An implementation of helloworld.cpp using PyGURLS
 
 @author: Pedro Santana (psantana@mit.edu).

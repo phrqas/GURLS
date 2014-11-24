@@ -37,9 +37,7 @@
 #  POSSIBILITY OF SUCH DAMAGE.
 #
 """
-A Python wrapper for GURLS++
-
-Demonstrates data I/O using NumPy and GURLS++
+Demonstrates data I/O using NumPy and GURLS++.
 
 @author: Pedro Santana (psantana@mit.edu).
 """
