@@ -21,11 +21,15 @@ current capabilities of the package.
 Installation
 ============
 
-Before building pyGURLS, make sure that GURLS++ has been correctly built
-and that the shared librariy libgurls++.so can be found by ld. Also, make
-sure that you have NumPy, Scipy, and Cython installed. Let <GURLS-HOME> be 
-the folder where GURLS has been downloaded. In order to build and install 
-pyGURLS, it should be sufficient to do the following:
+Before building pyGURLS, make sure that:
+
+- GURLS++ has been correctly built;
+- the shared library libgurls++.so has been generated and installed (usually
+located at /usr/local/lib); 
+- NumPy, Scipy, and Cython are installed. 
+
+Let <GURLS-HOME> be the folder where GURLS has been downloaded. In order to build 
+and install pyGURLS, it should be sufficient to do the following:
 
     cd <GURLS-HOME>/pygurls
     python setup.py build_ext --inplace
@@ -34,12 +38,37 @@ This will make the Python module pygurls available for use. In order to be
 able to import it from any folder, you should add <GURLS-HOME>/pygurls
 to the environment variable PYTHONPATH.
 
-export PYTHONPATH=<GURLS-HOME>/pygurls:$PYTHONPATH
+    export PYTHONPATH=<GURLS-HOME>/pygurls:$PYTHONPATH
 
-If pyGURLS' Python dependencies are installed, you can easily get them using
-pip
+If everything has been correctly installed, you should be able to import pyGURLS into
+your Python session by issuing
+
+    import pygurls
+
+Troubleshooting
+----------------
+
+- If you're missing any of pyGURLS' Python dependencies, you can easily install
+them using Python package managers such as pip and easy_install. Assuming that you
+are using pip, you can install the most up-to-date versions of the packages by 
+issuing
 
     sudo pip install -U numpy scipy cython
+
+- If the command 
+
+    import pygurls
+
+fails with an error that says that libgurls++.so hasn't been found, it is probably
+because it hasn't been installed in a folder within your linkage path. The easiest 
+way to fix this is to add /usr/local/lib (or whatever folder you've chosen to install
+libgurls++.so in) to the environment variable LD_LIBRARY_PATH.
+
+    export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+
+- If you would like to make the changes to PYTHONPATH and LD_LIBRARY_PATH permanent,
+you should add the aforementioned export commands to your terminal initialization 
+script (e.g., ~/.bashrc in Ubuntu).
 
 Documentation
 =============
