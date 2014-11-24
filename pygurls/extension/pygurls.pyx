@@ -95,10 +95,7 @@ cdef class PyGURLS:
         vec_mat = np.array(gMat2D_vec)
         rows = self.thisptr.get_num_rows();
         cols = self.thisptr.get_num_cols();       
-        if rows>1 and cols>1: 
-            return vec_mat.reshape((rows,cols),order='F')
-        else:
-            return vec_mat                            
+        return vec_mat.reshape((rows,cols),order='F')        
     
     def get_field(self,field):            
         return self._gMat2D_to_np(self.thisptr.get_field(field))

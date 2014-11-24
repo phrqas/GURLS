@@ -45,25 +45,23 @@ An implementation of GURLSloocvprimal.cpp using PyGURLS
 """
 import pygurls
 import sys
+import os
 
 #Checks path 
-if len(sys.argv) != 5:   
-        print "========================================================================================"
-        print " Wrong parameters number (%d)."%(len(sys.argv))
-        print " Provide a valid path for training, test and output files using the following syntax:"
-        print " \n\n\t "+sys.argv[0]+" xtr xte ytr yte"
-        print "========================================================================================\n\n"
+#Checks path 
+if len(sys.argv) != 2:           
+        print "Usage: "+sys.argv[0]+" <path to gurls++ data directory>"        
         sys.exit()
-
+        
 # python object that handles the interface with GURLS++
 pg = pygurls.PyGURLS(data_type='double')
 #pg.clear_pipeline() 
 
 # load data from files specified as command-line arguments
-pg.load_data(sys.argv[1],'xtr')
-pg.load_data(sys.argv[2],'xte')
-pg.load_data(sys.argv[3],'ytr')
-pg.load_data(sys.argv[4],'yte')
+pg.load_data(os.path.join(sys.argv[1],'Xtr.txt'),'xtr')
+pg.load_data(os.path.join(sys.argv[1],'Xte.txt'),'xte')
+pg.load_data(os.path.join(sys.argv[1],'ytr_onecolumn.txt'),'ytr')
+pg.load_data(os.path.join(sys.argv[1],'yte_onecolumn.txt'),'yte')
 
 # specify the task sequence
 task_list = [['paramsel','loocvprimal'],
