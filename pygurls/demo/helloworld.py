@@ -104,7 +104,7 @@ pg.run('xte','Yte','eval_perf')
 acc = pg.get_option_field('perf','acc')
 
 print "\nPrediction accuracy is:"
-print '\t'.join(['\tClass '+str(i) for i in range(len(acc))])
+print '\t'.join(['\tClass '+str(i+1) for i in range(len(acc))])
 print '\t'.join(['\t%2.2f %%'%(acc[i]*100.0) for i in range(len(acc))])
 
 
