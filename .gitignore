@@ -1,4 +1,5 @@
 *build*
-*.*~
+*~
+*.bin
 gurls++/doc
 bgurls++/doc
