@@ -46,7 +46,7 @@ Module defining the different types of tests that can be executed.
 import numpy as np
 import pygurls
 import modshogun
-import sklearn
+import sklearn.svm
 
 def pygurls_gaussian_kernel(Xtrain,Ytrain,Xtest,Ytest,*args,**kwargs):
     """RBF kernel."""
@@ -90,7 +90,9 @@ def pygurls_linear_primal(Xtrain,Ytrain,Xtest,Ytest,*args,**kwargs):
     pg.add_data(Xtrain_center,'Xtrain'); pg.add_data(Ytrain_center,'Ytrain')
     pg.add_data(Xtest_center,'Xtest'); pg.add_data(Ytest_center,'Ytest')
     
-    task_list = [['kernel','linear'],['paramsel','loocvprimal'],['optimizer','rlsprimal'],
+#    task_list = [['kernel','linear'],['paramsel','loocvprimal'],['optimizer','rlsprimal'],
+#           ['pred','primal'],['perf','macroavg']]
+    task_list = [['split','ho'],['paramsel','hoprimal'],['optimizer','rlsprimal'],
            ['pred','primal'],['perf','macroavg']]
     pg.set_task_sequence(task_list)
     
@@ -112,9 +114,26 @@ def pygurls_linear_primal(Xtrain,Ytrain,Xtest,Ytest,*args,**kwargs):
 def shogun_linear(Xtrain,Ytrain,Xtest,Ytest,*args,**kwargs):
     return 0.0
 
-def sklearn_linear(Xtrain,Ytrain,Xtest,Ytest,*args,**kwargs):
-    return 0.0
 
+def sklearn_SVC_linear(Xtrain,Ytrain,Xtest,Ytest,*args,**kwargs):
+    sk = sklearn.svm.SVC(kernel='linear')    
+    sk.fit(Xtrain,Ytrain)
+    return sk.score(Xtest,Ytest)
+
+def sklearn_SVC_rbf(Xtrain,Ytrain,Xtest,Ytest,*args,**kwargs):
+    sk = sklearn.svm.SVC(kernel='rbf')    
+    sk.fit(Xtrain,Ytrain)
+    return sk.score(Xtest,Ytest)
+
+def sklearn_linear_SVC_primal(Xtrain,Ytrain,Xtest,Ytest,*args,**kwargs):
+    sk = sklearn.svm.LinearSVC(dual=False,fit_intercept=True)
+    sk.fit(Xtrain,Ytrain)
+    return sk.score(Xtest,Ytest)
+
+def sklearn_linear_SVC_dual(Xtrain,Ytrain,Xtest,Ytest,*args,**kwargs):
+    sk = sklearn.svm.LinearSVC(dual=True,fit_intercept=True)
+    sk.fit(Xtrain,Ytrain)
+    return sk.score(Xtest,Ytest)
     
     
     
