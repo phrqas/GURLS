@@ -48,10 +48,11 @@ import time
 import os
 import re
 import scipy.io
+from collections import OrderedDict
 
 def read_bench_config(config_file='config_benchmarks.txt'):    
     """Read the benchmark configuration file."""
-    learning_func_dict={}            
+    learning_func_dict=OrderedDict()            
     with open(config_file,'r') as f_conf:         
         for line in f_conf:
             line_trim = line.strip(' \t\n')
