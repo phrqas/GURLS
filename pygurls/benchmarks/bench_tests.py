@@ -43,12 +43,71 @@ Module defining the different types of tests that can be executed.
 
 @author: Pedro Santana (psantana@mit.edu).
 """ 
+import numpy as np
 import pygurls
 import modshogun
 import sklearn
 
-def pygurls_linear(Xtrain,Ytrain,Xtest,Ytest,*args,**kwargs):
-    return 0.0
+def pygurls_gaussian_kernel(Xtrain,Ytrain,Xtest,Ytest,*args,**kwargs):
+    """RBF kernel."""
+    pg = pygurls.PyGURLS(data_type='double')
+
+    pg.add_data(Xtrain,'Xtrain'); pg.add_data(Ytrain,'Ytrain')
+    pg.add_data(Xtest,'Xtest'); pg.add_data(Ytest,'Ytest')
+
+    task_list = [['paramsel','siglam'],['kernel','rbf'],['optimizer','rlsdual'],
+             ['predkernel','traintest'],['pred','dual'],['perf','macroavg']]
+    pg.set_task_sequence(task_list)
+    
+    pg.init_processes('processes',True)
+    
+    opt_str_list = ['computeNsave','computeNsave','computeNsave','ignore','ignore',
+                'ignore']
+    pg.add_process('train_process',opt_str_list)    
+    
+    opt_str_list = ['load','load','load','computeNsave','computeNsave',
+                'computeNsave']
+    pg.add_process('eval_perf',opt_str_list)
+    
+    pg.build_pipeline('pygurls_rbf_bench', True)
+    
+    pg.run('Xtrain','Ytrain','train_process')
+    pg.run('Xtest','Ytest','eval_perf')
+    
+    return pg.get_option_field('perf','acc')[0]
+
+def pygurls_linear_primal(Xtrain,Ytrain,Xtest,Ytest,*args,**kwargs):
+    """Linear kernel (primal)."""
+    pg = pygurls.PyGURLS(data_type='double')    
+    
+    Xtr_mean = np.mean(Xtrain,axis=0) #Centers the data
+    Ytr_mean = np.mean(Ytrain,axis=0)    
+    Xtrain_center = Xtrain - Xtr_mean 
+    Ytrain_center = Ytrain - Ytr_mean
+    Xtest_center = Xtest - Xtr_mean 
+    Ytest_center = Ytest - Ytr_mean
+    
+    pg.add_data(Xtrain_center,'Xtrain'); pg.add_data(Ytrain_center,'Ytrain')
+    pg.add_data(Xtest_center,'Xtest'); pg.add_data(Ytest_center,'Ytest')
+    
+    task_list = [['kernel','linear'],['paramsel','loocvprimal'],['optimizer','rlsprimal'],
+           ['pred','primal'],['perf','macroavg']]
+    pg.set_task_sequence(task_list)
+    
+    pg.init_processes('processes',True)
+
+    opt_str_list = ['computeNsave','computeNsave','computeNsave','ignore','ignore']
+    pg.add_process('train_process',opt_str_list)
+    
+    opt_str_list = ['load','load','load','computeNsave','computeNsave']
+    pg.add_process('eval_perf',opt_str_list)
+    
+    pg.build_pipeline('pygurls_lin_bench', True)
+    
+    pg.run('Xtrain','Ytrain','train_process')
+    pg.run('Xtest','Ytest','eval_perf')
+    
+    return pg.get_option_field('perf','acc')[0]
 
 def shogun_linear(Xtrain,Ytrain,Xtest,Ytest,*args,**kwargs):
     return 0.0

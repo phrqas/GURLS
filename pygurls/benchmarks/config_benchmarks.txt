@@ -3,7 +3,7 @@
 #   <test_func_name> <n-runs> <ds1> <ds2> ... | _all_
 #
 #
-pygurls_linear      1   _all_
-shogun_linear       1   pendigits.mat
-sklearn_linear      1   landsat.mat
+pygurls_linear_primal       1   _all_
+#shogun_linear              1   pendigits.mat
+#sklearn_linear             1   landsat.mat
 
