@@ -45,8 +45,8 @@ Module defining the different types of tests that can be executed.
 """ 
 import numpy as np
 import pygurls
-import modshogun
 import sklearn.svm
+#import modshogun
 
 def pygurls_gaussian_kernel(Xtrain,Ytrain,Xtest,Ytest,*args,**kwargs):
     """RBF kernel."""
@@ -110,9 +110,6 @@ def pygurls_linear_primal(Xtrain,Ytrain,Xtest,Ytest,*args,**kwargs):
     pg.run('Xtest','Ytest','eval_perf')
     
     return pg.get_option_field('perf','acc')[0]
-
-def shogun_linear(Xtrain,Ytrain,Xtest,Ytest,*args,**kwargs):
-    return 0.0
 
 
 def sklearn_SVC_linear(Xtrain,Ytrain,Xtest,Ytest,*args,**kwargs):
