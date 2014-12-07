@@ -108,4 +108,14 @@ already been generated) is very easy as well!
         $ python bench_run.py
 
 All results (accuracy on testing set and elapsed time) will be recorded in the
-file benchmark_results.txt.
+file 'benchmark_results.txt'. In addition to the text file, all benchmarking 
+results are also recorded in the nested dictionary 'benchmark_results', which
+can be retrieved from within a Python console. For instance, if you are using
+iPython, this is how you can print the benchmarking results:
+
+    $ ipython
+    In [1]: %run bench_run.py
+    In [2]: benchmark_results
+
+The 'benchmark_results' dictionary can be used for plotting and other 
+post-processing tasks.

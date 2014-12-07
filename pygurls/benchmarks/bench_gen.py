@@ -101,20 +101,27 @@ def write_run_script(learning_func_dict,ident=' '*4):
         f_run.write('from bench_gen import benchmark\n')
         f_run.write('from bench_tests import *\n\n')
         
+        f_run.write('benchmark_results={}\n')
         f_run.write('with open(\"benchmark_results.txt\",\"w\") as f_r:\n')                
         for func_name,param_dic in learning_func_dict.iteritems(): 
+            dic_func = 'benchmark_results[\"'+func_name+'\"]'
+            f_run.write(ident+dic_func+'={}\n')
+
             for dset in param_dic['datasets']:
                 dset_name = os.path.split(dset)[1]
                 bench_str = 'elap,perf = benchmark(mat_file=\"'+dset+'\",'
                 bench_str +='learning_func='+func_name+','                
                 bench_str += 'n_runs='+str(param_dic['nruns'])+','
                 bench_str += 'msg='+'\"Running '+func_name+' on '
-                bench_str += dset_name+'\")\n'           
+                bench_str += dset_name+'\")\n'                
                 f_run.write(ident+bench_str)
                 
+                dic_ds = dic_func+'[\"'+dset_name+'\"]'
+                f_run.write(ident+dic_ds+'={\"elap\":elap,\"perf\":perf}\n')
+
                 bench_str ='perf_str = [str(f) for f in perf];'                                 
                 f_run.write(ident+bench_str)                
-                bench_str ='elap_str = [str(f) for f in elap]\n\n'                                 
+                bench_str ='elap_str = [str(f) for f in elap]\n'                                 
                 f_run.write(ident+bench_str)                
                 
                 bench_str ='f_r.write(\"#'+func_name+','+dset_name+'\\n\")\n'  
