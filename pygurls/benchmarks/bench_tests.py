@@ -113,26 +113,26 @@ def pygurls_gaussian_kernel(Xtrain,Ytrain,Xtest,Ytest,*args,**kwargs):
     return pg.get_option_field('perf','acc')[0]
 
 def sklearn_linear_SVC_primal(Xtrain,Ytrain,Xtest,Ytest,*args,**kwargs):
-    parameters={'kernel': ['linear'], 'C': [1e-2,1e-1,1e0, 1e1, 1e2, 1e3]}
+    parameters={'C': [1e-2,1e-1,1e0, 1e1, 1e2, 1e3]}
     clf = GridSearchCV(LinearSVC(dual=False,fit_intercept=True), parameters)    
     clf.fit(Xtrain,Ytrain)
     return clf.score(Xtest,Ytest)
 
 def sklearn_linear_SVC_dual(Xtrain,Ytrain,Xtest,Ytest,*args,**kwargs):
-    parameters={'kernel': ['linear'], 'C': [1e-2,1e-1,1e0, 1e1, 1e2, 1e3]}
+    parameters={'C': [1e-2,1e-1,1e0, 1e1, 1e2, 1e3]}
     clf = GridSearchCV(LinearSVC(dual=True,fit_intercept=True), parameters)    
     clf.fit(Xtrain,Ytrain)
     return clf.score(Xtest,Ytest)
 
 def sklearn_SVC_linear(Xtrain,Ytrain,Xtest,Ytest,*args,**kwargs):
-    parameters={'kernel': ['linear'], 'C': [1e-2,1e-1,1e0, 1e1, 1e2, 1e3]}    
+    parameters={'C': [1e-2,1e-1,1e0, 1e1, 1e2, 1e3]}    
     clf = GridSearchCV(SVC(kernel='linear'), parameters)     
     clf.fit(Xtrain,Ytrain)
     return clf.score(Xtest,Ytest)
 
 def sklearn_SVC_rbf(Xtrain,Ytrain,Xtest,Ytest,*args,**kwargs):
-    parameters={'kernel': ['rbf'], 'C': [1e-3,1e-2,1e-1,1e0, 1e1, 1e2, 1e3],
-                                   'gamma':[1e-3,1e-2,1e-1,1e0, 1e1, 1e2, 1e3]}
+    parameters={'C': [1e-3,1e-2,1e-1,1e0, 1e1, 1e2, 1e3],
+                'gamma':[1e-3,1e-2,1e-1,1e0, 1e1, 1e2, 1e3]}
     clf = GridSearchCV(SVC(kernel='rbf'), parameters)     
     clf.fit(Xtrain,Ytrain)
     return clf.score(Xtest,Ytest)
