@@ -14,6 +14,7 @@
 #   specify that a learning function should be tested with all available data sets.
 #
 pygurls_linear_primal       1   _all_
+#pygurls_gaussian_kernel     1   _all_
 sklearn_linear_SVC_primal   1   _all_
 sklearn_linear_SVC_dual     1   _all_
 sklearn_SVC_linear          1   _all_

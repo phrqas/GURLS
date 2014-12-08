@@ -45,37 +45,9 @@ Module defining the different types of tests that can be executed.
 """ 
 import numpy as np
 import pygurls
-import sklearn.svm
-import sklearn.linear_model
-
-
-def pygurls_gaussian_kernel(Xtrain,Ytrain,Xtest,Ytest,*args,**kwargs):
-    """RBF kernel."""
-    pg = pygurls.PyGURLS(data_type='double')
-
-    pg.add_data(Xtrain,'Xtrain'); pg.add_data(Ytrain,'Ytrain')
-    pg.add_data(Xtest,'Xtest'); pg.add_data(Ytest,'Ytest')
-
-    task_list = [['paramsel','siglam'],['kernel','rbf'],['optimizer','rlsdual'],
-             ['predkernel','traintest'],['pred','dual'],['perf','macroavg']]
-    pg.set_task_sequence(task_list)
-    
-    pg.init_processes('processes',True)
-    
-    opt_str_list = ['computeNsave','computeNsave','computeNsave','ignore','ignore',
-                'ignore']
-    pg.add_process('train_process',opt_str_list)    
-    
-    opt_str_list = ['load','load','load','computeNsave','computeNsave',
-                'computeNsave']
-    pg.add_process('eval_perf',opt_str_list)
-    
-    pg.build_pipeline('pygurls_rbf_bench', True)
-    
-    pg.run('Xtrain','Ytrain','train_process')
-    pg.run('Xtest','Ytest','eval_perf')
-    
-    return pg.get_option_field('perf','acc')[0]
+from sklearn.svm import SVC, LinearSVC
+from sklearn.linear_model import  RidgeClassifierCV
+from sklearn.grid_search import GridSearchCV
 
 def pygurls_linear_primal(Xtrain,Ytrain,Xtest,Ytest,*args,**kwargs):
     """Linear kernel (primal)."""
@@ -112,29 +84,61 @@ def pygurls_linear_primal(Xtrain,Ytrain,Xtest,Ytest,*args,**kwargs):
     
     return pg.get_option_field('perf','acc')[0]
 
+def pygurls_gaussian_kernel(Xtrain,Ytrain,Xtest,Ytest,*args,**kwargs):
+    """RBF kernel."""
+    pg = pygurls.PyGURLS(data_type='double')
 
-def sklearn_SVC_linear(Xtrain,Ytrain,Xtest,Ytest,*args,**kwargs):
-    clf = sklearn.svm.SVC(kernel='linear')    
-    clf.fit(Xtrain,Ytrain)
-    return clf.score(Xtest,Ytest)
+    pg.add_data(Xtrain,'Xtrain'); pg.add_data(Ytrain,'Ytrain')
+    pg.add_data(Xtest,'Xtest'); pg.add_data(Ytest,'Ytest')
 
-def sklearn_SVC_rbf(Xtrain,Ytrain,Xtest,Ytest,*args,**kwargs):
-    clf = sklearn.svm.SVC(kernel='rbf')    
-    clf.fit(Xtrain,Ytrain)
-    return clf.score(Xtest,Ytest)
+    task_list = [['paramsel','siglam'],['kernel','rbf'],['optimizer','rlsdual'],
+             ['predkernel','traintest'],['pred','dual'],['perf','macroavg']]
+    pg.set_task_sequence(task_list)
+    
+    pg.init_processes('processes',True)
+    
+    opt_str_list = ['computeNsave','computeNsave','computeNsave','ignore','ignore',
+                'ignore']
+    pg.add_process('train_process',opt_str_list)    
+    
+    opt_str_list = ['load','load','load','computeNsave','computeNsave',
+                'computeNsave']
+    pg.add_process('eval_perf',opt_str_list)
+    
+    pg.build_pipeline('pygurls_rbf_bench', True)
+    
+    pg.run('Xtrain','Ytrain','train_process')
+    pg.run('Xtest','Ytest','eval_perf')
+    
+    return pg.get_option_field('perf','acc')[0]
 
 def sklearn_linear_SVC_primal(Xtrain,Ytrain,Xtest,Ytest,*args,**kwargs):
-    clf = sklearn.svm.LinearSVC(dual=False,fit_intercept=True)
+    parameters={'kernel': ['linear'], 'C': [1e-2,1e-1,1e0, 1e1, 1e2, 1e3]}
+    clf = GridSearchCV(LinearSVC(dual=False,fit_intercept=True), parameters)    
     clf.fit(Xtrain,Ytrain)
     return clf.score(Xtest,Ytest)
 
 def sklearn_linear_SVC_dual(Xtrain,Ytrain,Xtest,Ytest,*args,**kwargs):
-    clf = sklearn.svm.LinearSVC(dual=True,fit_intercept=True)
+    parameters={'kernel': ['linear'], 'C': [1e-2,1e-1,1e0, 1e1, 1e2, 1e3]}
+    clf = GridSearchCV(LinearSVC(dual=True,fit_intercept=True), parameters)    
+    clf.fit(Xtrain,Ytrain)
+    return clf.score(Xtest,Ytest)
+
+def sklearn_SVC_linear(Xtrain,Ytrain,Xtest,Ytest,*args,**kwargs):
+    parameters={'kernel': ['linear'], 'C': [1e-2,1e-1,1e0, 1e1, 1e2, 1e3]}    
+    clf = GridSearchCV(SVC(kernel='linear'), parameters)     
+    clf.fit(Xtrain,Ytrain)
+    return clf.score(Xtest,Ytest)
+
+def sklearn_SVC_rbf(Xtrain,Ytrain,Xtest,Ytest,*args,**kwargs):
+    parameters={'kernel': ['rbf'], 'C': [1e-3,1e-2,1e-1,1e0, 1e1, 1e2, 1e3],
+                                   'gamma':[1e-3,1e-2,1e-1,1e0, 1e1, 1e2, 1e3]}
+    clf = GridSearchCV(SVC(kernel='rbf'), parameters)     
     clf.fit(Xtrain,Ytrain)
     return clf.score(Xtest,Ytest)
     
 def sklearn_ridge_cv(Xtrain,Ytrain,Xtest,Ytest,*args,**kwargs):
-    clf = sklearn.linear_model.RidgeClassifierCV(fit_intercept=True)
+    clf = RidgeClassifierCV(fit_intercept=True)
     clf.fit(Xtrain,Ytrain)
     return clf.score(Xtest,Ytest)
     
