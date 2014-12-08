@@ -88,4 +88,50 @@ def generate_datasets(dataset_folder='./datasets',verbose=False,force=False):
                  
     return mat_file_dict,error_flag #Returns the list of generated mat files
    
+   
+def print_benchmark_results(results_dict,sep='   '):
+    methods = results_dict.keys()
+    datasets = set()
+    for m in results_dict.keys(): 
+        for ds in results_dict[m].keys():
+            datasets.add(ds)
+    datasets = list(datasets)
     
+    results_table = [['' for j in range(len(datasets))] for i in range(len(methods))]
+    for i,m in enumerate(methods):        
+        for j,ds in enumerate(datasets):        
+            if ds in results_dict[m].keys():
+                results_table[i][j] ='%.2f   %.4f'%(results_dict[m][ds]['perf'][0]*100.0,
+                                      results_dict[m][ds]['elap'][0])
+            else:
+                results_table[i][j] ='---   ---'            
+
+    max_len_method = max([len(m) for m in methods]+[len('Method')])
+    max_len_dataset = max([len(d) for d in datasets]+[len('perf(%)   elap(s)')])
+    max_len_result=-1
+    for i in range(len(methods)):
+        for j in range(len(datasets)):
+            if len(results_table[i][j])>max_len_result:
+                max_len_result = len(results_table[i][j])
+    max_col_width = max([max_len_dataset,max_len_result])
+   
+    #Table of results
+    bench_str=''
+    #Header   
+    bench_str+='Method'+' '*(max_len_method-len('Method'))+sep 
+    for ds in datasets:
+        bench_str+= ds+' '*(max_col_width-len(ds))+sep                   
+    bench_str+='\n'
+    bench_str+=(' '*max_len_method)+sep
+    for i in range(len(datasets)):
+        bench_str+='perf(%)   elap(s)'+' '*(max_col_width-len('perf(%)   elap(s)'))+sep
+    bench_str+='\n'
+    bench_str+=('#'*max_len_method+sep)+('#'*max_col_width+sep)*len(datasets)+'\n'
+                        
+    for i,m in enumerate(methods):
+        bench_str+= m+' '*(max_len_method-len(m))+sep
+        for j,ds in enumerate(datasets):
+            bench_str+= results_table[i][j]+' '*(max_col_width-len(results_table[i][j]))+sep            
+        bench_str+='\n'
+        
+    print bench_str   

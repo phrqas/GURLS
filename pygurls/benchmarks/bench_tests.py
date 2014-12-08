@@ -46,7 +46,8 @@ Module defining the different types of tests that can be executed.
 import numpy as np
 import pygurls
 import sklearn.svm
-#import modshogun
+import sklearn.linear_model
+
 
 def pygurls_gaussian_kernel(Xtrain,Ytrain,Xtest,Ytest,*args,**kwargs):
     """RBF kernel."""
@@ -113,24 +114,29 @@ def pygurls_linear_primal(Xtrain,Ytrain,Xtest,Ytest,*args,**kwargs):
 
 
 def sklearn_SVC_linear(Xtrain,Ytrain,Xtest,Ytest,*args,**kwargs):
-    sk = sklearn.svm.SVC(kernel='linear')    
-    sk.fit(Xtrain,Ytrain)
-    return sk.score(Xtest,Ytest)
+    clf = sklearn.svm.SVC(kernel='linear')    
+    clf.fit(Xtrain,Ytrain)
+    return clf.score(Xtest,Ytest)
 
 def sklearn_SVC_rbf(Xtrain,Ytrain,Xtest,Ytest,*args,**kwargs):
-    sk = sklearn.svm.SVC(kernel='rbf')    
-    sk.fit(Xtrain,Ytrain)
-    return sk.score(Xtest,Ytest)
+    clf = sklearn.svm.SVC(kernel='rbf')    
+    clf.fit(Xtrain,Ytrain)
+    return clf.score(Xtest,Ytest)
 
 def sklearn_linear_SVC_primal(Xtrain,Ytrain,Xtest,Ytest,*args,**kwargs):
-    sk = sklearn.svm.LinearSVC(dual=False,fit_intercept=True)
-    sk.fit(Xtrain,Ytrain)
-    return sk.score(Xtest,Ytest)
+    clf = sklearn.svm.LinearSVC(dual=False,fit_intercept=True)
+    clf.fit(Xtrain,Ytrain)
+    return clf.score(Xtest,Ytest)
 
 def sklearn_linear_SVC_dual(Xtrain,Ytrain,Xtest,Ytest,*args,**kwargs):
-    sk = sklearn.svm.LinearSVC(dual=True,fit_intercept=True)
-    sk.fit(Xtrain,Ytrain)
-    return sk.score(Xtest,Ytest)
+    clf = sklearn.svm.LinearSVC(dual=True,fit_intercept=True)
+    clf.fit(Xtrain,Ytrain)
+    return clf.score(Xtest,Ytest)
+    
+def sklearn_ridge_cv(Xtrain,Ytrain,Xtest,Ytest,*args,**kwargs):
+    clf = sklearn.linear_model.RidgeClassifierCV(fit_intercept=True)
+    clf.fit(Xtrain,Ytrain)
+    return clf.score(Xtest,Ytest)
     
     
     

@@ -1,10 +1,21 @@
-######   This is the configuration file for the pyGURLS benchmarks.
-#   Each line should have the following format
-#   <test_func_name> <n-runs> <ds1> <ds2> ... | _all_
+####### pyGURLS benchmarking configuration file. 
 #
+#   Syntax:
+#
+#       <test_func_name> <n-runs> <ds1> <ds2> ... | _all_
+#
+#   where 
+#
+#       <test_func_name>    -> name of a learning function defined in bench_tests.py
+#       <n-runs>            -> number of times the test should be run
+#       <ds1> <ds2> ...     -> list of datasets on which to run the learning function
+#
+#   Alternatively, you can use the word _all_ instead of a list of data sets to
+#   specify that a learning function should be tested with all available data sets.
 #
 pygurls_linear_primal       1   _all_
 sklearn_linear_SVC_primal   1   _all_
 sklearn_linear_SVC_dual     1   _all_
 sklearn_SVC_linear          1   _all_
 sklearn_SVC_rbf             1   _all_
+sklearn_ridge_cv            1   _all_
