@@ -99,19 +99,20 @@ already been generated) is very easy as well!
 
         $ cd <GURLS-HOME>/pygurls/benchmarks
     
-    2. Generate the benchmarking scripts;
+    2. Use 'bench_gen.py' to generate the benchmarking script 'bench_run.py';
     
         $ python bench_gen.py
 
-    3. Run the benchmarks;
+    3. Run the benchmark;
 
         $ python bench_run.py
 
 All results (accuracy on testing set and elapsed time) will be recorded in the
-file 'benchmark_results.txt'. In addition to the text file, all benchmarking 
-results are also recorded in the nested dictionary 'benchmark_results', which
-can be retrieved from within a Python console. For instance, if you are using
-iPython, this is how you can print the benchmarking results:
+results/ folder in a file called 'benchmark_results_%m_%d_%y-%H_%M_%S.txt'.
+In addition to the text file, all benchmarking results are also recorded in 
+the nested dictionary 'benchmark_results', which can be retrieved from within 
+a Python console. For instance, if you are using iPython, this is how you can 
+print the benchmarking results:
 
     $ ipython
     In [1]: %run bench_run.py
