@@ -109,10 +109,10 @@ def write_run_script(learning_func_dict,ident=' '*4):
         f_run.write('if not os.path.exists(\"results\"):\n')
         f_run.write(ident+'os.makedirs(\"results\")\n\n')
         
-        bench_file = 'benchmark_results_'+time.strftime('%m_%d_%y-%H_%M_%S')+'.txt'
-        bench_file = os.path.join(os.path.relpath('results'),bench_file)
+        f_run.write('bench_file = \"benchmark_results_\"+time.strftime(\"%m_%d_%y-%H_%M_%S\")+\".txt\"\n')
+        f_run.write('bench_file = os.path.join(os.path.relpath(\"results\"),bench_file)\n\n')
         
-        f_run.write('with open(\"'+bench_file+'\",\"w\") as f_r:\n')                
+        f_run.write('with open(bench_file,\"w\") as f_r:\n')                
         for func_name,param_dic in learning_func_dict.iteritems(): 
             dic_func = 'benchmark_results[\"'+func_name+'\"]'
             f_run.write(ident+dic_func+'={}\n')
@@ -142,7 +142,7 @@ def write_run_script(learning_func_dict,ident=' '*4):
                 bench_str ='f_r.write(\" \".join(elap_str)+\"\\n\\n\")\n\n'                 
                 f_run.write(ident+bench_str)
         
-        f_run.write(ident+'print \"\\n\\nResults recorded in '+bench_file+'\\n\\n\"\n')
+        f_run.write(ident+'print \"\\n\\nResults recorded in \"+bench_file+\"\\n\\n\"\n')
         f_run.write(ident+'bench_tab = misc.print_benchmark_results(benchmark_results)\n')
                  
         f_run.write(ident+'f_r.write((\"-\"*20)+\"\\n\\n\")\n')         
