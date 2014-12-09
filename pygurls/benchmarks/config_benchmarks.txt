@@ -13,10 +13,10 @@
 #   Alternatively, you can use the word _all_ instead of a list of data sets to
 #   specify that a learning function should be tested with all available data sets.
 #
-pygurls_linear_primal       1   _all_
-#pygurls_gaussian_kernel     1   _all_
-sklearn_linear_SVC_primal   1   _all_
-sklearn_linear_SVC_dual     1   _all_
-sklearn_SVC_linear          1   _all_
-sklearn_SVC_rbf             1   _all_
-sklearn_ridge_cv            1   _all_
+pygurls_linear_primal       1   ps1-dataset.mat ps2-dataset.mat
+pygurls_gaussian_kernel     1   ps1-dataset.mat ps2-dataset.mat
+sklearn_linear_SVC_primal   1   ps1-dataset.mat ps2-dataset.mat
+sklearn_linear_SVC_dual     1   ps1-dataset.mat ps2-dataset.mat
+sklearn_SVC_linear          1   ps1-dataset.mat ps2-dataset.mat
+sklearn_SVC_rbf             1   ps1-dataset.mat ps2-dataset.mat
+sklearn_ridge_cv            1   ps1-dataset.mat ps2-dataset.mat

@@ -134,4 +134,5 @@ def print_benchmark_results(results_dict,sep='   '):
             bench_str+= results_table[i][j]+' '*(max_col_width-len(results_table[i][j]))+sep            
         bench_str+='\n'
         
-    print bench_str   
+    print bench_str  
+    return bench_str
