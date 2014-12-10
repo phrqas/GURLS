@@ -45,6 +45,7 @@ Miscellaneous functions for benchmarking pyGURLS.
 """ 
 import os   
 import fnmatch as fn
+import numpy as np
 
 def has_file_pattern(file_list,pattern):
     for filename in file_list:
@@ -136,3 +137,15 @@ def print_benchmark_results(results_dict,sep='   '):
         
     print bench_str  
     return bench_str
+
+def multiclass_to_one_vs_all(y):
+    """Converts a multiclass classification to one-vs-all format."""
+    values = list(np.unique(y))
+    if len(values) == 2: #Binary classification, do nothing
+        return y
+    else: #Convert to one-vs-all          
+        Y = np.empty( (y.shape[0],int(len(values))) )
+        Y.fill(-1.0)
+        for i in range(Y.shape[0]):
+            Y[ i,values.index(y[i])] = 1.0
+        return Y    
