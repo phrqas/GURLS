@@ -162,6 +162,7 @@ def benchmark(mat_file,learning_func,n_runs=1,msg=''):
                              Ytest=ws['Ytest'])        
         elap_list.append(time.time()-start)
         perf_list.append(perf)
+        print "Run %d: Elap(s)=%.4f, Perf(%%)=%.2f\n"%(n+1,elap_list[-1],perf_list[-1])
     return elap_list,perf_list
 
 
